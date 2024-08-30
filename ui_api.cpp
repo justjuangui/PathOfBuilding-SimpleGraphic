@@ -136,7 +136,7 @@ static int l_##Name(lua_State* L) {                                \
 
 #define SG_LUA_CPP_FUN_END()                          \
 		catch (ui_expectationFailed_s) { return -1; } \
-    };                                                \
+	};                                                \
 	int rc = fun(L);                                  \
 	if (rc < 0) { LuaErrorWrapper(L); }               \
 	return rc; }
@@ -1579,6 +1579,9 @@ int ui_main_c::InitAPI(lua_State* L)
 	lua_pushcfunction(L, l_Exit);
 	lua_setfield(L, -2, "exit");
 	lua_pop(L, 1);		// Pop 'os' table
+
+	// ImGui Methods
+	LoadImguiBindings(L);
 
 	return 0;
 }

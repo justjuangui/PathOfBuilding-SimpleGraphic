@@ -348,10 +348,23 @@ void ui_main_c::ScriptInit()
 		}
 	}
 	if ( !didExit && !restartFlag ) {
+		imGuiStack.clear();
 		// Check for frame callback
+		
 		int extraArgs = PushCallback("OnFrame");
 		if (extraArgs >= 0) {
 			lua_pop(L, 1 + extraArgs);
+
+			bool wasEmpty = imGuiStack.empty();
+			while (!imGuiStack.empty()) {
+				ImEndStack(imGuiStack.back());
+				imGuiStack.pop_back();
+			}
+
+			if (!wasEmpty) {
+				sys->con->Printf("Warning: ImGui stack was not empty after OnFrame\n");
+			}
+
 		} else {
 			sys->con->Printf("\nScript didn't set frame callback, exiting...\n");
 			sys->Exit();
@@ -392,11 +405,23 @@ void ui_main_c::Frame()
 		}
 	}
 
+	imGuiStack.clear();
+
 	// Run script
 	//sys->con->Printf("OnFrame...\n");
 	int extraArgs = PushCallback("OnFrame");
 	if (extraArgs >= 0) {
 		PCall(extraArgs, 0);
+	}
+
+	bool wasEmpty = imGuiStack.empty();
+	while (!imGuiStack.empty()) {
+		ImEndStack(imGuiStack.back());
+		imGuiStack.pop_back();
+	}
+
+	if (!wasEmpty) {
+		sys->con->Printf("Warning: ImGui stack was not empty after OnFrame\n");
 	}
 
 	renderEnable = false;

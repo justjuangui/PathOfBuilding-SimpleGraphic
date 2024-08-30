@@ -29,3 +29,15 @@ extern "C" {
 #include "ui_subscript.h"
 
 #include "ui_main.h"
+
+// to keep track of end and begins and clean up the imgui stack
+// if lua errors
+
+#include <deque>
+// Stack for imgui begin and end
+extern std::deque<int> imGuiStack;
+static void AddToImGuiStack(int type);
+static void PopEndImGuiStack(int type);
+void ImEndStack(int type);
+// ImGui Binding Function definition
+void LoadImguiBindings(lua_State* L);

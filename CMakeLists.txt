@@ -67,11 +67,13 @@ set(SIMPLEGRAPHIC_SOURCES
     "ui_console.h"
     "ui_debug.cpp"
     "ui_debug.h"
+    "imgui_lua_bindings.cpp"
     "ui_local.h"
     "ui_main.cpp"
     "ui_main.h"
     "ui_subscript.cpp"
     "ui_subscript.h"
+    "imgui_iterator.inl"
 )
 
 set (SIMPLEGRAPHIC_PLATFORM_SOURCES)
