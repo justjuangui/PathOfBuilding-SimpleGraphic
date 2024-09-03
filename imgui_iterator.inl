@@ -13,9 +13,11 @@
 // Unsupported return type ImGuiContext*
 //    IMGUI_API void          SetCurrentContext(ImGuiContext* ctx);
 // Unsupported arg type ImGuiContext* ctx
-//    IMGUI_API ImGuiIO&      GetIO();                                    // access the IO structure (mouse/keyboard/gamepad inputs, time, various configuration options/flags)
+//    IMGUI_API ImGuiIO&      GetIO();                                    // access the ImGuiIO structure (mouse/keyboard/gamepad inputs, time, various configuration options/flags)
 // Unsupported return type ImGuiIO&
-//    IMGUI_API ImGuiStyle&   GetStyle();                                 // access the Style structure (colors, sizes). Always use PushStyleCol(), PushStyleVar() to modify style mid-frame!
+//    IMGUI_API ImGuiPlatformIO& GetPlatformIO();                         // access the ImGuiPlatformIO structure (mostly hooks/functions to connect to platform/renderer and OS Clipboard, IME etc.)
+// Unsupported return type ImGuiPlatformIO&
+//    IMGUI_API ImGuiStyle&   GetStyle();                                 // access the Style structure (colors, sizes). Always use PushStyleColor(), PushStyleVar() to modify style mid-frame!
 // Unsupported return type ImGuiStyle&
 //    IMGUI_API void          NewFrame();                                 // start a new Dear ImGui frame, you can submit any command from this point until Render()/EndFrame().
 //Not allowed to use this function
@@ -46,10 +48,10 @@ OPTIONAL_BOOL_POINTER_ARG(p_open)
 CALL_FUNCTION_NO_RET(ShowDebugLogWindow, p_open)
 END_BOOL_POINTER(p_open)
 END_IMGUI_FUNC
-//    IMGUI_API void          ShowStackToolWindow(bool* p_open = NULL);   // create Stack Tool window. hover items with mouse to query information about the source of their unique ID.
-IMGUI_FUNCTION(ShowStackToolWindow)
+//    IMGUI_API void          ShowIDStackToolWindow(bool* p_open = NULL); // create Stack Tool window. hover items with mouse to query information about the source of their unique ID.
+IMGUI_FUNCTION(ShowIDStackToolWindow)
 OPTIONAL_BOOL_POINTER_ARG(p_open)
-CALL_FUNCTION_NO_RET(ShowStackToolWindow, p_open)
+CALL_FUNCTION_NO_RET(ShowIDStackToolWindow, p_open)
 END_BOOL_POINTER(p_open)
 END_IMGUI_FUNC
 //    IMGUI_API void          ShowAboutWindow(bool* p_open = NULL);       // create About window. display Dear ImGui version, credits and build/system information.
@@ -101,26 +103,10 @@ IMGUI_FUNCTION(End)
 CALL_FUNCTION_NO_RET(End)
 POP_END_STACK(1)
 END_IMGUI_FUNC
-//    IMGUI_API bool          BeginChild(const char* str_id, const ImVec2& size = ImVec2 0 0, bool border = false, ImGuiWindowFlags flags = 0);
-IMGUI_FUNCTION(BeginChild)
-LABEL_ARG(str_id)
-OPTIONAL_IM_VEC_2_ARG(size, 0, 0)
-OPTIONAL_BOOL_ARG(border, false)
-OPTIONAL_INT_ARG(flags, 0)
-CALL_FUNCTION(BeginChild, bool, str_id, size, border, flags)
-IF_RET_ADD_END_STACK(2)
-PUSH_BOOL(ret)
-END_IMGUI_FUNC
-//    IMGUI_API bool          BeginChild(ImGuiID id, const ImVec2& size = ImVec2 0 0, bool border = false, ImGuiWindowFlags flags = 0);
-IMGUI_FUNCTION(BeginChild_4)
-UINT_ARG(id)
-OPTIONAL_IM_VEC_2_ARG(size, 0, 0)
-OPTIONAL_BOOL_ARG(border, false)
-OPTIONAL_INT_ARG(flags, 0)
-CALL_FUNCTION(BeginChild, bool, id, size, border, flags)
-IF_RET_ADD_END_STACK(2)
-PUSH_BOOL(ret)
-END_IMGUI_FUNC
+//    IMGUI_API bool          BeginChild(const char* str_id, const ImVec2& size = ImVec2 0 0, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0);
+// Unsupported arg type  ImGuiChildFlags child_flags = 0
+//    IMGUI_API bool          BeginChild(ImGuiID id, const ImVec2& size = ImVec2 0 0, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0);
+// Unsupported arg type  ImGuiChildFlags child_flags = 0
 //    IMGUI_API void          EndChild();
 IMGUI_FUNCTION(EndChild)
 CALL_FUNCTION_NO_RET(EndChild)
@@ -138,32 +124,32 @@ PUSH_BOOL(ret)
 END_IMGUI_FUNC
 //    IMGUI_API bool          IsWindowFocused(ImGuiFocusedFlags flags=0); // is current window focused? or its root/child, depending on flags. see flags for options.
 // Unsupported arg type ImGuiFocusedFlags flags=0
-//    IMGUI_API bool          IsWindowHovered(ImGuiHoveredFlags flags=0); // is current window hovered (and typically: not blocked by a popup/modal)? see flags for options. NB: If you are trying to check whether your mouse should be dispatched to imgui or to your app, you should use the 'io.WantCaptureMouse' boolean for that! Please read the FAQ!
+//    IMGUI_API bool          IsWindowHovered(ImGuiHoveredFlags flags=0); // is current window hovered and hoverable (e.g. not blocked by a popup/modal)? See ImGuiHoveredFlags_ for options. IMPORTANT: If you are trying to check whether your mouse should be dispatched to Dear ImGui or to your underlying app, you should not use this function! Use the 'io.WantCaptureMouse' boolean for that! Refer to FAQ entry "How can I tell whether to dispatch mouse/keyboard to Dear ImGui or my application?" for details.
 IMGUI_FUNCTION(IsWindowHovered)
-OPTIONAL_INT_ARG(flags, 0)
-CALL_FUNCTION(IsWindowHovered, bool, flags = 0)
+INT_ARG(flags)
+CALL_FUNCTION(IsWindowHovered, bool, flags)
 PUSH_BOOL(ret)
 END_IMGUI_FUNC
 //    IMGUI_API ImDrawList*   GetWindowDrawList();                        // get draw list associated to the current window, to append your own drawing primitives
 // Unsupported return type ImDrawList*
-//    IMGUI_API ImVec2        GetWindowPos();                             // get current window position in screen space (note: it is unlikely you need to use this. Consider using current layout pos instead, GetScreenCursorPos())
+//    IMGUI_API ImVec2        GetWindowPos();                             // get current window position in screen space (IT IS UNLIKELY YOU EVER NEED TO USE THIS. Consider always using GetCursorScreenPos() and GetContentRegionAvail() instead)
 IMGUI_FUNCTION(GetWindowPos)
 CALL_FUNCTION(GetWindowPos, ImVec2)
 PUSH_NUMBER(ret.x)
 PUSH_NUMBER(ret.y)
 END_IMGUI_FUNC
-//    IMGUI_API ImVec2        GetWindowSize();                            // get current window size (note: it is unlikely you need to use this. Consider using GetScreenCursorPos() and e.g. GetContentRegionAvail() instead)
+//    IMGUI_API ImVec2        GetWindowSize();                            // get current window size (IT IS UNLIKELY YOU EVER NEED TO USE THIS. Consider always using GetCursorScreenPos() and GetContentRegionAvail() instead)
 IMGUI_FUNCTION(GetWindowSize)
 CALL_FUNCTION(GetWindowSize, ImVec2)
 PUSH_NUMBER(ret.x)
 PUSH_NUMBER(ret.y)
 END_IMGUI_FUNC
-//    IMGUI_API float         GetWindowWidth();                           // get current window width (shortcut for GetWindowSize().x)
+//    IMGUI_API float         GetWindowWidth();                           // get current window width (IT IS UNLIKELY YOU EVER NEED TO USE THIS). Shortcut for GetWindowSize().x.
 IMGUI_FUNCTION(GetWindowWidth)
 CALL_FUNCTION(GetWindowWidth, float)
 PUSH_NUMBER(ret)
 END_IMGUI_FUNC
-//    IMGUI_API float         GetWindowHeight();                          // get current window height (shortcut for GetWindowSize().y)
+//    IMGUI_API float         GetWindowHeight();                          // get current window height (IT IS UNLIKELY YOU EVER NEED TO USE THIS). Shortcut for GetWindowSize().y.
 IMGUI_FUNCTION(GetWindowHeight)
 CALL_FUNCTION(GetWindowHeight, float)
 PUSH_NUMBER(ret)
@@ -181,7 +167,7 @@ IM_VEC_2_ARG(size)
 OPTIONAL_INT_ARG(cond, 0)
 CALL_FUNCTION_NO_RET(SetNextWindowSize, size, cond)
 END_IMGUI_FUNC
-//    IMGUI_API void          SetNextWindowSizeConstraints(const ImVec2& size_min, const ImVec2& size_max, ImGuiSizeCallback custom_callback = NULL, void* custom_callback_data = NULL); // set next window size limits. use -1,-1 on either X/Y axis to preserve the current size. Sizes will be rounded down. Use callback to apply non-trivial programmatic constraints.
+//    IMGUI_API void          SetNextWindowSizeConstraints(const ImVec2& size_min, const ImVec2& size_max, ImGuiSizeCallback custom_callback = NULL, void* custom_callback_data = NULL); // set next window size limits. use 0.0f or FLT_MAX if you don't want limits. Use -1 for both min and max of same axis to preserve current size (which itself is a constraint). Use callback to apply non-trivial programmatic constraints.
 // Unsupported arg type  ImGuiSizeCallback custom_callback = NULL
 // Unsupported arg type  void* custom_callback_data = NULL
 //    IMGUI_API void          SetNextWindowContentSize(const ImVec2& size);                               // set next window content size (~ scrollable client area, which enforce the range of scrollbars). Not including window decorations (title bar, menu bar, etc.) nor WindowPadding. set an axis to 0.0f to leave it automatic. call before Begin()
@@ -262,30 +248,6 @@ IMGUI_FUNCTION(SetWindowFocus_1)
 LABEL_ARG(name)
 CALL_FUNCTION_NO_RET(SetWindowFocus, name)
 END_IMGUI_FUNC
-//    IMGUI_API ImVec2        GetContentRegionAvail();                                        // == GetContentRegionMax() - GetCursorPos()
-IMGUI_FUNCTION(GetContentRegionAvail)
-CALL_FUNCTION(GetContentRegionAvail, ImVec2)
-PUSH_NUMBER(ret.x)
-PUSH_NUMBER(ret.y)
-END_IMGUI_FUNC
-//    IMGUI_API ImVec2        GetContentRegionMax();                                          // current content boundaries (typically window boundaries including scrolling, or current column boundaries), in windows coordinates
-IMGUI_FUNCTION(GetContentRegionMax)
-CALL_FUNCTION(GetContentRegionMax, ImVec2)
-PUSH_NUMBER(ret.x)
-PUSH_NUMBER(ret.y)
-END_IMGUI_FUNC
-//    IMGUI_API ImVec2        GetWindowContentRegionMin();                                    // content boundaries min for the full window (roughly (0,0)-Scroll), in window coordinates
-IMGUI_FUNCTION(GetWindowContentRegionMin)
-CALL_FUNCTION(GetWindowContentRegionMin, ImVec2)
-PUSH_NUMBER(ret.x)
-PUSH_NUMBER(ret.y)
-END_IMGUI_FUNC
-//    IMGUI_API ImVec2        GetWindowContentRegionMax();                                    // content boundaries max for the full window (roughly (0,0)+Size-Scroll) where Size can be overridden with SetNextWindowContentSize(), in window coordinates
-IMGUI_FUNCTION(GetWindowContentRegionMax)
-CALL_FUNCTION(GetWindowContentRegionMax, ImVec2)
-PUSH_NUMBER(ret.x)
-PUSH_NUMBER(ret.y)
-END_IMGUI_FUNC
 //    IMGUI_API float         GetScrollX();                                                   // get scrolling amount [0 .. GetScrollMaxX()]
 IMGUI_FUNCTION(GetScrollX)
 CALL_FUNCTION(GetScrollX, float)
@@ -361,19 +323,31 @@ IMGUI_FUNCTION(PopStyleColor)
 OPTIONAL_INT_ARG(count, 1)
 CALL_FUNCTION_NO_RET(PopStyleColor, count)
 END_IMGUI_FUNC
-//    IMGUI_API void          PushStyleVar(ImGuiStyleVar idx, float val);                     // modify a style float variable. always use this if you modify the style after NewFrame().
+//    IMGUI_API void          PushStyleVar(ImGuiStyleVar idx, float val);                     // modify a style float variable. always use this if you modify the style after NewFrame()!
 IMGUI_FUNCTION(PushStyleVar)
 INT_ARG(idx)
 NUMBER_ARG(val)
 CALL_FUNCTION_NO_RET(PushStyleVar, idx, val)
 ADD_END_STACK(3)
 END_IMGUI_FUNC
-//    IMGUI_API void          PushStyleVar(ImGuiStyleVar idx, const ImVec2& val);             // modify a style ImVec2 variable. always use this if you modify the style after NewFrame().
+//    IMGUI_API void          PushStyleVar(ImGuiStyleVar idx, const ImVec2& val);             // modify a style ImVec2 variable. "
 IMGUI_FUNCTION(PushStyleVar_2)
 INT_ARG(idx)
 IM_VEC_2_ARG(val)
 CALL_FUNCTION_NO_RET(PushStyleVar, idx, val)
 ADD_END_STACK(3)
+END_IMGUI_FUNC
+//    IMGUI_API void          PushStyleVarX(ImGuiStyleVar idx, float val_x);                  // modify X component of a style ImVec2 variable. "
+IMGUI_FUNCTION(PushStyleVarX)
+INT_ARG(idx)
+NUMBER_ARG(val_x)
+CALL_FUNCTION_NO_RET(PushStyleVarX, idx, val_x)
+END_IMGUI_FUNC
+//    IMGUI_API void          PushStyleVarY(ImGuiStyleVar idx, float val_y);                  // modify Y component of a style ImVec2 variable. "
+IMGUI_FUNCTION(PushStyleVarY)
+INT_ARG(idx)
+NUMBER_ARG(val_y)
+CALL_FUNCTION_NO_RET(PushStyleVarY, idx, val_y)
 END_IMGUI_FUNC
 //    IMGUI_API void          PopStyleVar(int count = 1);
 IMGUI_FUNCTION(PopStyleVar)
@@ -381,23 +355,11 @@ OPTIONAL_INT_ARG(count, 1)
 CALL_FUNCTION_NO_RET(PopStyleVar, count)
 POP_END_STACK(3)
 END_IMGUI_FUNC
-//    IMGUI_API void          PushTabStop(bool tab_stop);                                     // == tab stop enable. Allow focusing using TAB/Shift-TAB, enabled by default but you can disable it for certain widgets
-IMGUI_FUNCTION(PushTabStop)
-BOOL_ARG(tab_stop)
-CALL_FUNCTION_NO_RET(PushTabStop, tab_stop)
-END_IMGUI_FUNC
-//    IMGUI_API void          PopTabStop();
-IMGUI_FUNCTION(PopTabStop)
-CALL_FUNCTION_NO_RET(PopTabStop)
-END_IMGUI_FUNC
-//    IMGUI_API void          PushButtonRepeat(bool repeat);                                  // in 'repeat' mode, Button*() functions return repeated true in a typematic manner (using io.KeyRepeatDelay/io.KeyRepeatRate setting). Note that you can call IsItemActive() after any Button() to tell if the button is held in the current frame.
-IMGUI_FUNCTION(PushButtonRepeat)
-BOOL_ARG(repeat)
-CALL_FUNCTION_NO_RET(PushButtonRepeat, repeat)
-END_IMGUI_FUNC
-//    IMGUI_API void          PopButtonRepeat();
-IMGUI_FUNCTION(PopButtonRepeat)
-CALL_FUNCTION_NO_RET(PopButtonRepeat)
+//    IMGUI_API void          PushItemFlag(ImGuiItemFlags option, bool enabled);              // modify specified shared item flag, e.g. PushItemFlag(ImGuiItemFlags_NoTabStop, true)
+// Unsupported arg type ImGuiItemFlags option
+//    IMGUI_API void          PopItemFlag();
+IMGUI_FUNCTION(PopItemFlag)
+CALL_FUNCTION_NO_RET(PopItemFlag)
 END_IMGUI_FUNC
 //    IMGUI_API void          PushItemWidth(float item_width);                                // push width of items for common large "item+label" widgets. >0.0f: width in pixels, <0.0f align xx pixels to the right of window (so -FLT_MIN always align width to the right side).
 IMGUI_FUNCTION(PushItemWidth)
@@ -434,7 +396,7 @@ IMGUI_FUNCTION(GetFontSize)
 CALL_FUNCTION(GetFontSize, float)
 PUSH_NUMBER(ret)
 END_IMGUI_FUNC
-//    IMGUI_API ImVec2        GetFontTexUvWhitePixel();                                       // get UV coordinate for a while pixel, useful to draw custom shapes via the ImDrawList API
+//    IMGUI_API ImVec2        GetFontTexUvWhitePixel();                                       // get UV coordinate for a white pixel, useful to draw custom shapes via the ImDrawList API
 IMGUI_FUNCTION(GetFontTexUvWhitePixel)
 CALL_FUNCTION(GetFontTexUvWhitePixel, ImVec2)
 PUSH_NUMBER(ret.x)
@@ -453,14 +415,69 @@ IM_VEC_4_ARG(col)
 CALL_FUNCTION(GetColorU32, unsigned int, col)
 PUSH_NUMBER(ret)
 END_IMGUI_FUNC
-//    IMGUI_API ImU32         GetColorU32(ImU32 col);                                         // retrieve given color with style alpha applied, packed as a 32-bit value suitable for ImDrawList
-IMGUI_FUNCTION(GetColorU32_1_1)
+//    IMGUI_API ImU32         GetColorU32(ImU32 col, float alpha_mul = 1.0f);                 // retrieve given color with style alpha applied, packed as a 32-bit value suitable for ImDrawList
+IMGUI_FUNCTION(GetColorU32_2)
 UINT_ARG(col)
-CALL_FUNCTION(GetColorU32, unsigned int, col)
+OPTIONAL_NUMBER_ARG(alpha_mul, 1.0f)
+CALL_FUNCTION(GetColorU32, unsigned int, col, alpha_mul)
 PUSH_NUMBER(ret)
 END_IMGUI_FUNC
 //    IMGUI_API const ImVec4& GetStyleColorVec4(ImGuiCol idx);                                // retrieve style color as stored in ImGuiStyle structure. use to feed back into PushStyleColor(), otherwise use GetColorU32() to get style color with style alpha baked in.
 // Unsupported return type const
+//    IMGUI_API ImVec2        GetCursorScreenPos();                                           // cursor position, absolute coordinates. THIS IS YOUR BEST FRIEND (prefer using this rather than GetCursorPos(), also more useful to work with ImDrawList API).
+IMGUI_FUNCTION(GetCursorScreenPos)
+CALL_FUNCTION(GetCursorScreenPos, ImVec2)
+PUSH_NUMBER(ret.x)
+PUSH_NUMBER(ret.y)
+END_IMGUI_FUNC
+//    IMGUI_API void          SetCursorScreenPos(const ImVec2& pos);                          // cursor position, absolute coordinates. THIS IS YOUR BEST FRIEND.
+IMGUI_FUNCTION(SetCursorScreenPos)
+IM_VEC_2_ARG(pos)
+CALL_FUNCTION_NO_RET(SetCursorScreenPos, pos)
+END_IMGUI_FUNC
+//    IMGUI_API ImVec2        GetContentRegionAvail();                                        // available space from current position. THIS IS YOUR BEST FRIEND.
+IMGUI_FUNCTION(GetContentRegionAvail)
+CALL_FUNCTION(GetContentRegionAvail, ImVec2)
+PUSH_NUMBER(ret.x)
+PUSH_NUMBER(ret.y)
+END_IMGUI_FUNC
+//    IMGUI_API ImVec2        GetCursorPos();                                                 // [window-local] cursor position in window-local coordinates. This is not your best friend.
+IMGUI_FUNCTION(GetCursorPos)
+CALL_FUNCTION(GetCursorPos, ImVec2)
+PUSH_NUMBER(ret.x)
+PUSH_NUMBER(ret.y)
+END_IMGUI_FUNC
+//    IMGUI_API float         GetCursorPosX();                                                // [window-local] "
+IMGUI_FUNCTION(GetCursorPosX)
+CALL_FUNCTION(GetCursorPosX, float)
+PUSH_NUMBER(ret)
+END_IMGUI_FUNC
+//    IMGUI_API float         GetCursorPosY();                                                // [window-local] "
+IMGUI_FUNCTION(GetCursorPosY)
+CALL_FUNCTION(GetCursorPosY, float)
+PUSH_NUMBER(ret)
+END_IMGUI_FUNC
+//    IMGUI_API void          SetCursorPos(const ImVec2& local_pos);                          // [window-local] "
+IMGUI_FUNCTION(SetCursorPos)
+IM_VEC_2_ARG(local_pos)
+CALL_FUNCTION_NO_RET(SetCursorPos, local_pos)
+END_IMGUI_FUNC
+//    IMGUI_API void          SetCursorPosX(float local_x);                                   // [window-local] "
+IMGUI_FUNCTION(SetCursorPosX)
+NUMBER_ARG(local_x)
+CALL_FUNCTION_NO_RET(SetCursorPosX, local_x)
+END_IMGUI_FUNC
+//    IMGUI_API void          SetCursorPosY(float local_y);                                   // [window-local] "
+IMGUI_FUNCTION(SetCursorPosY)
+NUMBER_ARG(local_y)
+CALL_FUNCTION_NO_RET(SetCursorPosY, local_y)
+END_IMGUI_FUNC
+//    IMGUI_API ImVec2        GetCursorStartPos();                                            // [window-local] initial cursor position, in window-local coordinates. Call GetCursorScreenPos() after Begin() to get the absolute coordinates version.
+IMGUI_FUNCTION(GetCursorStartPos)
+CALL_FUNCTION(GetCursorStartPos, ImVec2)
+PUSH_NUMBER(ret.x)
+PUSH_NUMBER(ret.y)
+END_IMGUI_FUNC
 //    IMGUI_API void          Separator();                                                    // separator, generally horizontal. inside a menu bar or in horizontal layout mode, this becomes a vertical separator.
 IMGUI_FUNCTION(Separator)
 CALL_FUNCTION_NO_RET(Separator)
@@ -503,54 +520,6 @@ END_IMGUI_FUNC
 IMGUI_FUNCTION(EndGroup)
 CALL_FUNCTION_NO_RET(EndGroup)
 POP_END_STACK(4)
-END_IMGUI_FUNC
-//    IMGUI_API ImVec2        GetCursorPos();                                                 // cursor position in window coordinates (relative to window position)
-IMGUI_FUNCTION(GetCursorPos)
-CALL_FUNCTION(GetCursorPos, ImVec2)
-PUSH_NUMBER(ret.x)
-PUSH_NUMBER(ret.y)
-END_IMGUI_FUNC
-//    IMGUI_API float         GetCursorPosX();                                                //   (some functions are using window-relative coordinates, such as: GetCursorPos, GetCursorStartPos, GetContentRegionMax, GetWindowContentRegion* etc.
-IMGUI_FUNCTION(GetCursorPosX)
-CALL_FUNCTION(GetCursorPosX, float)
-PUSH_NUMBER(ret)
-END_IMGUI_FUNC
-//    IMGUI_API float         GetCursorPosY();                                                //    other functions such as GetCursorScreenPos or everything in ImDrawList::
-IMGUI_FUNCTION(GetCursorPosY)
-CALL_FUNCTION(GetCursorPosY, float)
-PUSH_NUMBER(ret)
-END_IMGUI_FUNC
-//    IMGUI_API void          SetCursorPos(const ImVec2& local_pos);                          //    are using the main, absolute coordinate system.
-IMGUI_FUNCTION(SetCursorPos)
-IM_VEC_2_ARG(local_pos)
-CALL_FUNCTION_NO_RET(SetCursorPos, local_pos)
-END_IMGUI_FUNC
-//    IMGUI_API void          SetCursorPosX(float local_x);                                   //    GetWindowPos() + GetCursorPos() == GetCursorScreenPos() etc.)
-IMGUI_FUNCTION(SetCursorPosX)
-NUMBER_ARG(local_x)
-CALL_FUNCTION_NO_RET(SetCursorPosX, local_x)
-END_IMGUI_FUNC
-//    IMGUI_API void          SetCursorPosY(float local_y);                                   //
-IMGUI_FUNCTION(SetCursorPosY)
-NUMBER_ARG(local_y)
-CALL_FUNCTION_NO_RET(SetCursorPosY, local_y)
-END_IMGUI_FUNC
-//    IMGUI_API ImVec2        GetCursorStartPos();                                            // initial cursor position in window coordinates
-IMGUI_FUNCTION(GetCursorStartPos)
-CALL_FUNCTION(GetCursorStartPos, ImVec2)
-PUSH_NUMBER(ret.x)
-PUSH_NUMBER(ret.y)
-END_IMGUI_FUNC
-//    IMGUI_API ImVec2        GetCursorScreenPos();                                           // cursor position in absolute coordinates (useful to work with ImDrawList API). generally top-left == GetMainViewport()->Pos == (0,0) in single viewport mode, and bottom-right == GetMainViewport()->Pos+Size == io.DisplaySize in single-viewport mode.
-IMGUI_FUNCTION(GetCursorScreenPos)
-CALL_FUNCTION(GetCursorScreenPos, ImVec2)
-PUSH_NUMBER(ret.x)
-PUSH_NUMBER(ret.y)
-END_IMGUI_FUNC
-//    IMGUI_API void          SetCursorScreenPos(const ImVec2& pos);                          // cursor position in absolute coordinates
-IMGUI_FUNCTION(SetCursorScreenPos)
-IM_VEC_2_ARG(pos)
-CALL_FUNCTION_NO_RET(SetCursorScreenPos, pos)
 END_IMGUI_FUNC
 //    IMGUI_API void          AlignTextToFramePadding();                                      // vertically align upcoming text baseline to FramePadding.y so that it will align properly to regularly framed items (call if you have text on a line before a framed item)
 IMGUI_FUNCTION(AlignTextToFramePadding)
@@ -613,6 +582,12 @@ PUSH_NUMBER(ret)
 END_IMGUI_FUNC
 //    IMGUI_API ImGuiID       GetID(const void* ptr_id);
 // Unsupported arg type const void* ptr_id
+//    IMGUI_API ImGuiID       GetID(int int_id);
+IMGUI_FUNCTION(GetID_1)
+INT_ARG(int_id)
+CALL_FUNCTION(GetID, unsigned int, int_id)
+PUSH_NUMBER(ret)
+END_IMGUI_FUNC
 //    IMGUI_API void          TextUnformatted(const char* text, const char* text_end = NULL); // raw text without formatting. Roughly equivalent to Text("%s", text) but: A) doesn't require null terminated string if 'text_end' is specified, B) it's faster, no memory copy is done, no buffer size limits, recommended for long chunks of text.
 IMGUI_FUNCTION(TextUnformatted)
 LABEL_ARG(text)
@@ -655,7 +630,7 @@ OPTIONAL_IM_VEC_2_ARG(size, 0, 0)
 CALL_FUNCTION(Button, bool, label, size)
 PUSH_BOOL(ret)
 END_IMGUI_FUNC
-//    IMGUI_API bool          SmallButton(const char* label);                                 // button with FramePadding=(0,0) to easily embed within text
+//    IMGUI_API bool          SmallButton(const char* label);                                 // button with (FramePadding.y == 0) to easily embed within text
 IMGUI_FUNCTION(SmallButton)
 LABEL_ARG(label)
 CALL_FUNCTION(SmallButton, bool, label)
@@ -718,26 +693,38 @@ END_IMGUI_FUNC
 IMGUI_FUNCTION(Bullet)
 CALL_FUNCTION_NO_RET(Bullet)
 END_IMGUI_FUNC
-//    IMGUI_API void          Image(ImTextureID user_texture_id, const ImVec2& size, const ImVec2& uv0 = ImVec2 0 0, const ImVec2& uv1 = ImVec2 1 1, const ImVec4& tint_col = ImVec4 1 1 1 1, const ImVec4& border_col = ImVec4 0 0 0 0);
+//    IMGUI_API bool          TextLink(const char* label);                                    // hyperlink text button, return true when clicked
+IMGUI_FUNCTION(TextLink)
+LABEL_ARG(label)
+CALL_FUNCTION(TextLink, bool, label)
+PUSH_BOOL(ret)
+END_IMGUI_FUNC
+//    IMGUI_API void          TextLinkOpenURL(const char* label, const char* url = NULL);     // hyperlink text button, automatically open file/url when clicked
+IMGUI_FUNCTION(TextLinkOpenURL)
+LABEL_ARG(label)
+OPTIONAL_LABEL_ARG(url)
+CALL_FUNCTION_NO_RET(TextLinkOpenURL, label, url)
+END_IMGUI_FUNC
+//    IMGUI_API void          Image(ImTextureID user_texture_id, const ImVec2& image_size, const ImVec2& uv0 = ImVec2 0 0, const ImVec2& uv1 = ImVec2 1 1, const ImVec4& tint_col = ImVec4 1 1 1 1, const ImVec4& border_col = ImVec4 0 0 0 0);
 IMGUI_FUNCTION(Image)
 IM_TEXTURE_ID_ARG(user_texture_id)
-IM_VEC_2_ARG(size)
+IM_VEC_2_ARG(image_size)
 OPTIONAL_IM_VEC_2_ARG(uv0, 0, 0)
 OPTIONAL_IM_VEC_2_ARG(uv1, 1, 1)
 OPTIONAL_IM_VEC_4_ARG(tint_col, 1, 1, 1, 1)
 OPTIONAL_IM_VEC_4_ARG(border_col, 0, 0, 0, 0)
-CALL_FUNCTION_NO_RET(Image, user_texture_id, size, uv0, uv1, tint_col, border_col)
+CALL_FUNCTION_NO_RET(Image, user_texture_id, image_size, uv0, uv1, tint_col, border_col)
 END_IMGUI_FUNC
-//    IMGUI_API bool          ImageButton(const char* str_id, ImTextureID user_texture_id, const ImVec2& size, const ImVec2& uv0 = ImVec2 0 0, const ImVec2& uv1 = ImVec2 1 1, const ImVec4& bg_col = ImVec4 0 0 0 0, const ImVec4& tint_col = ImVec4 1 1 1 1);
+//    IMGUI_API bool          ImageButton(const char* str_id, ImTextureID user_texture_id, const ImVec2& image_size, const ImVec2& uv0 = ImVec2 0 0, const ImVec2& uv1 = ImVec2 1 1, const ImVec4& bg_col = ImVec4 0 0 0 0, const ImVec4& tint_col = ImVec4 1 1 1 1);
 IMGUI_FUNCTION(ImageButton)
 LABEL_ARG(str_id)
 IM_TEXTURE_ID_ARG(user_texture_id)
-IM_VEC_2_ARG(size)
+IM_VEC_2_ARG(image_size)
 OPTIONAL_IM_VEC_2_ARG(uv0, 0, 0)
 OPTIONAL_IM_VEC_2_ARG(uv1, 1, 1)
 OPTIONAL_IM_VEC_4_ARG(bg_col, 0, 0, 0, 0)
 OPTIONAL_IM_VEC_4_ARG(tint_col, 1, 1, 1, 1)
-CALL_FUNCTION(ImageButton, bool, str_id, user_texture_id, size, uv0, uv1, bg_col, tint_col)
+CALL_FUNCTION(ImageButton, bool, str_id, user_texture_id, image_size, uv0, uv1, bg_col, tint_col)
 PUSH_BOOL(ret)
 END_IMGUI_FUNC
 //    IMGUI_API bool          BeginCombo(const char* label, const char* preview_value, ImGuiComboFlags flags = 0);
@@ -766,10 +753,9 @@ CALL_FUNCTION(Combo, bool, label, current_item, items_separated_by_zeros, popup_
 PUSH_BOOL(ret)
 END_INT_POINTER(current_item)
 END_IMGUI_FUNC
-//    IMGUI_API bool          Combo(const char* label, int* current_item, bool(*items_getter)(void* data, int idx, const char** out_text), void* data, int items_count, int popup_max_height_in_items = -1);
-// Unsupported arg type  bool(*items_getter)(void* data
-// Unsupported arg type  const char** out_text)
-// Unsupported arg type  void* data
+//    IMGUI_API bool          Combo(const char* label, int* current_item, const char* (*getter)(void* user_data, int idx), void* user_data, int items_count, int popup_max_height_in_items = -1);
+// Unsupported arg type  const char* (*getter)(void* user_data
+// Unsupported arg type  void* user_data
 //    IMGUI_API bool          DragFloat(const char* label, float* v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f", ImGuiSliderFlags flags = 0);     // If v_min >= v_max we have no bound
 // Unsupported arg type  ImGuiSliderFlags flags = 0
 //    IMGUI_API bool          DragFloat2(const char* label, float v[2], float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
@@ -968,7 +954,7 @@ END_IMGUI_FUNC
 // Unsupported arg type const void* ptr_id
 // Unsupported arg type  ImGuiTreeNodeFlags flags
 // Unsupported arg type  va_list args) IM_FMTLIST(3
-//    IMGUI_API void          TreePush(const char* str_id);                                       // ~ Indent()+PushId(). Already called by TreeNode() when returning true, but you can call TreePush/TreePop yourself if desired.
+//    IMGUI_API void          TreePush(const char* str_id);                                       // ~ Indent()+PushID(). Already called by TreeNode() when returning true, but you can call TreePush/TreePop yourself if desired.
 IMGUI_FUNCTION(TreePush)
 LABEL_ARG(str_id)
 CALL_FUNCTION_NO_RET(TreePush, str_id)
@@ -976,7 +962,7 @@ ADD_END_STACK(6)
 END_IMGUI_FUNC
 //    IMGUI_API void          TreePush(const void* ptr_id);                                       // "
 // Unsupported arg type const void* ptr_id
-//    IMGUI_API void          TreePop();                                                          // ~ Unindent()+PopId()
+//    IMGUI_API void          TreePop();                                                          // ~ Unindent()+PopID()
 IMGUI_FUNCTION(TreePop)
 CALL_FUNCTION_NO_RET(TreePop)
 POP_END_STACK(6)
@@ -995,6 +981,11 @@ IMGUI_FUNCTION(SetNextItemOpen)
 BOOL_ARG(is_open)
 OPTIONAL_INT_ARG(cond, 0)
 CALL_FUNCTION_NO_RET(SetNextItemOpen, is_open, cond)
+END_IMGUI_FUNC
+//    IMGUI_API void          SetNextItemStorageID(ImGuiID storage_id);                           // set id to use for open/close storage (default to same as item id).
+IMGUI_FUNCTION(SetNextItemStorageID)
+UINT_ARG(storage_id)
+CALL_FUNCTION_NO_RET(SetNextItemStorageID, storage_id)
 END_IMGUI_FUNC
 //    IMGUI_API bool          Selectable(const char* label, bool selected = false, ImGuiSelectableFlags flags = 0, const ImVec2& size = ImVec2 0 0); // "bool selected" carry the selection state (read-only). Selectable() is clicked is returns true so you can modify your selection state. size.x==0.0: use remaining width, size.x>0.0: specify width. size.y==0.0: use label height, size.y>0.0: specify height
 IMGUI_FUNCTION(Selectable)
@@ -1015,6 +1006,18 @@ CALL_FUNCTION(Selectable, bool, label, p_selected, flags, size)
 PUSH_BOOL(ret)
 END_BOOL_POINTER(p_selected)
 END_IMGUI_FUNC
+//    IMGUI_API ImGuiMultiSelectIO*   BeginMultiSelect(ImGuiMultiSelectFlags flags, int selection_size = -1, int items_count = -1);
+// Unsupported return type ImGuiMultiSelectIO*
+// Unsupported arg type ImGuiMultiSelectFlags flags
+//    IMGUI_API ImGuiMultiSelectIO*   EndMultiSelect();
+// Unsupported return type ImGuiMultiSelectIO*
+//    IMGUI_API void                  SetNextItemSelectionUserData(ImGuiSelectionUserData selection_user_data);
+// Unsupported arg type ImGuiSelectionUserData selection_user_data
+//    IMGUI_API bool                  IsItemToggledSelection();                                   // Was the last item selection state toggled? Useful if you need the per-item information _before_ reaching EndMultiSelect(). We only returns toggle _event_ in order to handle clipping correctly.
+IMGUI_FUNCTION(IsItemToggledSelection)
+CALL_FUNCTION(IsItemToggledSelection, bool)
+PUSH_BOOL(ret)
+END_IMGUI_FUNC
 //    IMGUI_API bool          BeginListBox(const char* label, const ImVec2& size = ImVec2 0 0); // open a framed scrolling region
 IMGUI_FUNCTION(BeginListBox)
 LABEL_ARG(label)
@@ -1030,10 +1033,9 @@ POP_END_STACK(7)
 END_IMGUI_FUNC
 //    IMGUI_API bool          ListBox(const char* label, int* current_item, const char* const items[], int items_count, int height_in_items = -1);
 // Unsupported arg type  const char* const items[]
-//    IMGUI_API bool          ListBox(const char* label, int* current_item, bool (*items_getter)(void* data, int idx, const char** out_text), void* data, int items_count, int height_in_items = -1);
-// Unsupported arg type  bool (*items_getter)(void* data
-// Unsupported arg type  const char** out_text)
-// Unsupported arg type  void* data
+//    IMGUI_API bool          ListBox(const char* label, int* current_item, const char* (*getter)(void* user_data, int idx), void* user_data, int items_count, int height_in_items = -1);
+// Unsupported arg type  const char* (*getter)(void* user_data
+// Unsupported arg type  void* user_data
 //    IMGUI_API void          PlotLines(const char* label, const float* values, int values_count, int values_offset = 0, const char* overlay_text = NULL, float scale_min = FLT_MAX, float scale_max = FLT_MAX, ImVec2 graph_size = ImVec2 0 0, int stride = sizeof(float));
 // Unsupported arg type  const float* values
 // Unsupported arg type  ImVec2 graph_size = ImVec2 0 0
@@ -1044,8 +1046,8 @@ END_IMGUI_FUNC
 //    IMGUI_API void          PlotHistogram(const char* label, const float* values, int values_count, int values_offset = 0, const char* overlay_text = NULL, float scale_min = FLT_MAX, float scale_max = FLT_MAX, ImVec2 graph_size = ImVec2 0 0, int stride = sizeof(float));
 // Unsupported arg type  const float* values
 // Unsupported arg type  ImVec2 graph_size = ImVec2 0 0
-//    IMGUI_API void          PlotHistogram(const char* label, float(*values_getter)(void* data, int idx), void* data, int values_count, int values_offset = 0, const char* overlay_text = NULL, float scale_min = FLT_MAX, float scale_max = FLT_MAX, ImVec2 graph_size = ImVec2 0 0);
-// Unsupported arg type  float(*values_getter)(void* data
+//    IMGUI_API void          PlotHistogram(const char* label, float (*values_getter)(void* data, int idx), void* data, int values_count, int values_offset = 0, const char* overlay_text = NULL, float scale_min = FLT_MAX, float scale_max = FLT_MAX, ImVec2 graph_size = ImVec2 0 0);
+// Unsupported arg type  float (*values_getter)(void* data
 // Unsupported arg type  void* data
 // Unsupported arg type  ImVec2 graph_size = ImVec2 0 0
 //    IMGUI_API void          Value(const char* prefix, bool b);
@@ -1148,7 +1150,7 @@ CALL_FUNCTION(BeginItemTooltip, bool)
 IF_RET_ADD_END_STACK(12)
 PUSH_BOOL(ret)
 END_IMGUI_FUNC
-//    IMGUI_API void          SetItemTooltip(const char* fmt, ...) IM_FMTARGS(1);                 // set a text-only tooltip if preceeding item was hovered. override any previous call to SetTooltip().
+//    IMGUI_API void          SetItemTooltip(const char* fmt, ...) IM_FMTARGS(1);                 // set a text-only tooltip if preceding item was hovered. override any previous call to SetTooltip().
 // Unsupported arg type  ...) IM_FMTARGS(1
 //    IMGUI_API void          SetItemTooltipV(const char* fmt, va_list args) IM_FMTLIST(1);
 // Unsupported arg type  va_list args) IM_FMTLIST(1
@@ -1206,14 +1208,14 @@ OPTIONAL_INT_ARG(flags, 0)
 CALL_FUNCTION(IsPopupOpen, bool, str_id, flags)
 PUSH_BOOL(ret)
 END_IMGUI_FUNC
-//    IMGUI_API bool          BeginTable(const char* str_id, int column, ImGuiTableFlags flags = 0, const ImVec2& outer_size = ImVec2 0.0f 0.0f, float inner_width = 0.0f);
+//    IMGUI_API bool          BeginTable(const char* str_id, int columns, ImGuiTableFlags flags = 0, const ImVec2& outer_size = ImVec2 0.0f 0.0f, float inner_width = 0.0f);
 IMGUI_FUNCTION(BeginTable)
 LABEL_ARG(str_id)
-INT_ARG(column)
+INT_ARG(columns)
 OPTIONAL_INT_ARG(flags, 0)
 OPTIONAL_IM_VEC_2_ARG(outer_size, 0.0f, 0.0f)
 OPTIONAL_NUMBER_ARG(inner_width, 0.0f)
-CALL_FUNCTION(BeginTable, bool, str_id, column, flags, outer_size, inner_width)
+CALL_FUNCTION(BeginTable, bool, str_id, columns, flags, outer_size, inner_width)
 IF_RET_ADD_END_STACK(14)
 PUSH_BOOL(ret)
 END_IMGUI_FUNC
@@ -1253,14 +1255,18 @@ INT_ARG(cols)
 INT_ARG(rows)
 CALL_FUNCTION_NO_RET(TableSetupScrollFreeze, cols, rows)
 END_IMGUI_FUNC
-//    IMGUI_API void          TableHeadersRow();                                  // submit all headers cells based on data provided to TableSetupColumn() + submit context menu
-IMGUI_FUNCTION(TableHeadersRow)
-CALL_FUNCTION_NO_RET(TableHeadersRow)
-END_IMGUI_FUNC
 //    IMGUI_API void          TableHeader(const char* label);                     // submit one header cell manually (rarely used)
 IMGUI_FUNCTION(TableHeader)
 LABEL_ARG(label)
 CALL_FUNCTION_NO_RET(TableHeader, label)
+END_IMGUI_FUNC
+//    IMGUI_API void          TableHeadersRow();                                  // submit a row with headers cells based on data provided to TableSetupColumn() + submit context menu
+IMGUI_FUNCTION(TableHeadersRow)
+CALL_FUNCTION_NO_RET(TableHeadersRow)
+END_IMGUI_FUNC
+//    IMGUI_API void          TableAngledHeadersRow();                            // submit a row with angled headers for every column with the ImGuiTableColumnFlags_AngledHeader flag. MUST BE FIRST ROW.
+IMGUI_FUNCTION(TableAngledHeadersRow)
+CALL_FUNCTION_NO_RET(TableAngledHeadersRow)
 END_IMGUI_FUNC
 //    IMGUI_API ImGuiTableSortSpecs*  TableGetSortSpecs();                        // get latest sort specs for the table (NULL if not sorting).  Lifetime: don't hold on this pointer over multiple frames or past any subsequent call to BeginTable().
 // Unsupported return type ImGuiTableSortSpecs*
@@ -1284,14 +1290,16 @@ INT_ARG(column_n)
 BOOL_ARG(v)
 CALL_FUNCTION_NO_RET(TableSetColumnEnabled, column_n, v)
 END_IMGUI_FUNC
+//    IMGUI_API int                   TableGetHoveredColumn();                    // return hovered column. return -1 when table is not hovered. return columns_count if the unused space at the right of visible columns is hovered. Can also use (TableGetColumnFlags() & ImGuiTableColumnFlags_IsHovered) instead.
+// Unsupported return type int
 //    IMGUI_API void                  TableSetBgColor(ImGuiTableBgTarget target, ImU32 color, int column_n = -1);  // change the color of a cell, row, or column. See ImGuiTableBgTarget_ flags for details.
 // Unsupported arg type ImGuiTableBgTarget target
-//    IMGUI_API void          Columns(int count = 1, const char* id = NULL, bool border = true);
+//    IMGUI_API void          Columns(int count = 1, const char* id = NULL, bool borders = true);
 IMGUI_FUNCTION(Columns)
 OPTIONAL_INT_ARG(count, 1)
 OPTIONAL_LABEL_ARG(id)
-OPTIONAL_BOOL_ARG(border, true)
-CALL_FUNCTION_NO_RET(Columns, count, id, border)
+OPTIONAL_BOOL_ARG(borders, true)
+CALL_FUNCTION_NO_RET(Columns, count, id, borders)
 END_IMGUI_FUNC
 //    IMGUI_API void          NextColumn();                                                       // next column, defaults to current row or next row if the current row is finished
 IMGUI_FUNCTION(NextColumn)
@@ -1417,7 +1425,7 @@ IMGUI_FUNCTION(EndDragDropTarget)
 CALL_FUNCTION_NO_RET(EndDragDropTarget)
 POP_END_STACK(18)
 END_IMGUI_FUNC
-//    IMGUI_API const ImGuiPayload*   GetDragDropPayload();                                                           // peek directly into the current payload from anywhere. may return NULL. use ImGuiPayload::IsDataType() to test for the payload type.
+//    IMGUI_API const ImGuiPayload*   GetDragDropPayload();                                                           // peek directly into the current payload from anywhere. returns NULL when drag and drop is finished or inactive. use ImGuiPayload::IsDataType() to test for the payload type.
 // Unsupported return type const
 //    IMGUI_API void          BeginDisabled(bool disabled = true);
 IMGUI_FUNCTION(BeginDisabled)
@@ -1575,20 +1583,6 @@ END_IMGUI_FUNC
 // Unsupported arg type ImGuiStorage* storage
 //    IMGUI_API ImGuiStorage* GetStateStorage();
 // Unsupported return type ImGuiStorage*
-//    IMGUI_API bool          BeginChildFrame(ImGuiID id, const ImVec2& size, ImGuiWindowFlags flags = 0); // helper to create a child window / scrolling region that looks like a normal widget frame
-IMGUI_FUNCTION(BeginChildFrame)
-UINT_ARG(id)
-IM_VEC_2_ARG(size)
-OPTIONAL_INT_ARG(flags, 0)
-CALL_FUNCTION(BeginChildFrame, bool, id, size, flags)
-IF_RET_ADD_END_STACK(20)
-PUSH_BOOL(ret)
-END_IMGUI_FUNC
-//    IMGUI_API void          EndChildFrame();                                                    // always call EndChildFrame() regardless of BeginChildFrame() return values (which indicates a collapsed/clipped window)
-IMGUI_FUNCTION(EndChildFrame)
-CALL_FUNCTION_NO_RET(EndChildFrame)
-POP_END_STACK(20)
-END_IMGUI_FUNC
 //    IMGUI_API ImVec2        CalcTextSize(const char* text, const char* text_end = NULL, bool hide_text_after_double_hash = false, float wrap_width = -1.0f);
 IMGUI_FUNCTION(CalcTextSize)
 LABEL_ARG(text)
@@ -1634,6 +1628,8 @@ GUIKEY_ARG(key)
 CALL_FUNCTION(IsKeyReleased, bool, key)
 PUSH_BOOL(ret)
 END_IMGUI_FUNC
+//    IMGUI_API bool          IsKeyChordPressed(ImGuiKeyChord key_chord);                         // was key chord (mods + key) pressed, e.g. you can pass 'ImGuiMod_Ctrl | ImGuiKey_S' as a key-chord. This doesn't do any routing or focus check, please consider using Shortcut() function instead.
+// Unsupported arg type ImGuiKeyChord key_chord
 //    IMGUI_API int           GetKeyPressedAmount(ImGuiKey key, float repeat_delay, float rate);  // uses provided repeat rate/delay. return a count, most often 0 or 1 but might be >1 if RepeatRate is small enough that DeltaTime > RepeatRate
 // Unsupported return type int
 //    IMGUI_API const char*   GetKeyName(ImGuiKey key);                                           // [DEBUG] returns English name of the key. Those names a provided for debugging purpose and are not meant to be saved persistently not compared.
@@ -1646,6 +1642,17 @@ END_IMGUI_FUNC
 IMGUI_FUNCTION(SetNextFrameWantCaptureKeyboard)
 BOOL_ARG(want_capture_keyboard)
 CALL_FUNCTION_NO_RET(SetNextFrameWantCaptureKeyboard, want_capture_keyboard)
+END_IMGUI_FUNC
+//    IMGUI_API bool          Shortcut(ImGuiKeyChord key_chord, ImGuiInputFlags flags = 0);
+// Unsupported arg type ImGuiKeyChord key_chord
+// Unsupported arg type  ImGuiInputFlags flags = 0
+//    IMGUI_API void          SetNextItemShortcut(ImGuiKeyChord key_chord, ImGuiInputFlags flags = 0);
+// Unsupported arg type ImGuiKeyChord key_chord
+// Unsupported arg type  ImGuiInputFlags flags = 0
+//    IMGUI_API void          SetItemKeyOwner(ImGuiKey key);                                      // Set key owner to last item ID if it is hovered or active. Equivalent to 'if (IsItemHovered() || IsItemActive()) { SetKeyOwner(key, GetItemID());'.
+IMGUI_FUNCTION(SetItemKeyOwner)
+GUIKEY_ARG(key)
+CALL_FUNCTION_NO_RET(SetItemKeyOwner, key)
 END_IMGUI_FUNC
 //    IMGUI_API bool          IsMouseDown(ImGuiMouseButton button);                               // is mouse button held?
 // Unsupported arg type ImGuiMouseButton button
@@ -1685,9 +1692,9 @@ CALL_FUNCTION(GetMousePosOnOpeningCurrentPopup, ImVec2)
 PUSH_NUMBER(ret.x)
 PUSH_NUMBER(ret.y)
 END_IMGUI_FUNC
-//    IMGUI_API bool          IsMouseDragging(ImGuiMouseButton button, float lock_threshold = -1.0f);         // is mouse dragging? (if lock_threshold < -1.0f, uses io.MouseDraggingThreshold)
+//    IMGUI_API bool          IsMouseDragging(ImGuiMouseButton button, float lock_threshold = -1.0f);         // is mouse dragging? (uses io.MouseDraggingThreshold if lock_threshold < 0.0f)
 // Unsupported arg type ImGuiMouseButton button
-//    IMGUI_API ImVec2        GetMouseDragDelta(ImGuiMouseButton button = 0, float lock_threshold = -1.0f);   // return the delta from the initial clicking position while the mouse button is pressed or was just released. This is locked and return 0.0f until the mouse moves past a distance threshold at least once (if lock_threshold < -1.0f, uses io.MouseDraggingThreshold)
+//    IMGUI_API ImVec2        GetMouseDragDelta(ImGuiMouseButton button = 0, float lock_threshold = -1.0f);   // return the delta from the initial clicking position while the mouse button is pressed or was just released. This is locked and return 0.0f until the mouse moves past a distance threshold at least once (uses io.MouseDraggingThreshold if lock_threshold < 0.0f)
 // Unsupported arg type ImGuiMouseButton button = 0
 //    IMGUI_API void          ResetMouseDragDelta(ImGuiMouseButton button = 0);                   //
 // Unsupported arg type ImGuiMouseButton button = 0
@@ -1732,6 +1739,15 @@ IMGUI_FUNCTION(DebugTextEncoding)
 LABEL_ARG(text)
 CALL_FUNCTION_NO_RET(DebugTextEncoding, text)
 END_IMGUI_FUNC
+//    IMGUI_API void          DebugFlashStyleColor(ImGuiCol idx);
+IMGUI_FUNCTION(DebugFlashStyleColor)
+INT_ARG(idx)
+CALL_FUNCTION_NO_RET(DebugFlashStyleColor, idx)
+END_IMGUI_FUNC
+//    IMGUI_API void          DebugStartItemPicker();
+IMGUI_FUNCTION(DebugStartItemPicker)
+CALL_FUNCTION_NO_RET(DebugStartItemPicker)
+END_IMGUI_FUNC
 //    IMGUI_API bool          DebugCheckVersionAndDataLayout(const char* version_str, size_t sz_io, size_t sz_style, size_t sz_vec2, size_t sz_vec4, size_t sz_drawvert, size_t sz_drawidx); // This is called by IMGUI_CHECKVERSION() macro.
 // Unsupported arg type  size_t sz_io
 // Unsupported arg type  size_t sz_style
@@ -1739,6 +1755,10 @@ END_IMGUI_FUNC
 // Unsupported arg type  size_t sz_vec4
 // Unsupported arg type  size_t sz_drawvert
 // Unsupported arg type  size_t sz_drawidx
+//    IMGUI_API void          DebugLog(const char* fmt, ...)           IM_FMTARGS(1); // Call via IMGUI_DEBUG_LOG() for maximum stripping in caller code!
+// Unsupported arg type  ...)           IM_FMTARGS(1
+//    IMGUI_API void          DebugLogV(const char* fmt, va_list args) IM_FMTLIST(1);
+// Unsupported arg type  va_list args) IM_FMTLIST(1
 //    IMGUI_API void          SetAllocatorFunctions(ImGuiMemAllocFunc alloc_func, ImGuiMemFreeFunc free_func, void* user_data = NULL);
 // Unsupported arg type ImGuiMemAllocFunc alloc_func
 // Unsupported arg type  ImGuiMemFreeFunc free_func
@@ -1773,7 +1793,6 @@ END_STACK_OPTION(16, EndTabItem)
 END_STACK_OPTION(17, EndDragDropSource)
 END_STACK_OPTION(18, EndDragDropTarget)
 END_STACK_OPTION(19, EndDisabled)
-END_STACK_OPTION(20, EndChildFrame)
 END_STACK_END
 //enum ImGuiWindowFlags_
 
@@ -1812,13 +1831,11 @@ MAKE_ENUM(ImGuiWindowFlags_NoBringToFrontOnFocus, NoBringToFrontOnFocus)
 MAKE_ENUM(ImGuiWindowFlags_AlwaysVerticalScrollbar, AlwaysVerticalScrollbar)
 //    ImGuiWindowFlags_AlwaysHorizontalScrollbar=1<< 15
 MAKE_ENUM(ImGuiWindowFlags_AlwaysHorizontalScrollbar, AlwaysHorizontalScrollbar)
-//    ImGuiWindowFlags_AlwaysUseWindowPadding = 1 << 16
-MAKE_ENUM(ImGuiWindowFlags_AlwaysUseWindowPadding, AlwaysUseWindowPadding)
-//    ImGuiWindowFlags_NoNavInputs            = 1 << 18
+//    ImGuiWindowFlags_NoNavInputs            = 1 << 16
 MAKE_ENUM(ImGuiWindowFlags_NoNavInputs, NoNavInputs)
-//    ImGuiWindowFlags_NoNavFocus             = 1 << 19
+//    ImGuiWindowFlags_NoNavFocus             = 1 << 17
 MAKE_ENUM(ImGuiWindowFlags_NoNavFocus, NoNavFocus)
-//    ImGuiWindowFlags_UnsavedDocument        = 1 << 20
+//    ImGuiWindowFlags_UnsavedDocument        = 1 << 18
 MAKE_ENUM(ImGuiWindowFlags_UnsavedDocument, UnsavedDocument)
 //    ImGuiWindowFlags_NoNav                  = ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoNavFocus
 MAKE_ENUM(ImGuiWindowFlags_NoNav, NoNav)
@@ -1826,8 +1843,6 @@ MAKE_ENUM(ImGuiWindowFlags_NoNav, NoNav)
 MAKE_ENUM(ImGuiWindowFlags_NoDecoration, NoDecoration)
 //    ImGuiWindowFlags_NoInputs               = ImGuiWindowFlags_NoMouseInputs | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoNavFocus
 MAKE_ENUM(ImGuiWindowFlags_NoInputs, NoInputs)
-//    ImGuiWindowFlags_NavFlattened           = 1 << 23
-MAKE_ENUM(ImGuiWindowFlags_NavFlattened, NavFlattened)
 //    ImGuiWindowFlags_ChildWindow            = 1 << 24
 MAKE_ENUM(ImGuiWindowFlags_ChildWindow, ChildWindow)
 //    ImGuiWindowFlags_Tooltip                = 1 << 25
@@ -1838,7 +1853,53 @@ MAKE_ENUM(ImGuiWindowFlags_Popup, Popup)
 MAKE_ENUM(ImGuiWindowFlags_Modal, Modal)
 //    ImGuiWindowFlags_ChildMenu              = 1 << 28
 MAKE_ENUM(ImGuiWindowFlags_ChildMenu, ChildMenu)
+//    ImGuiWindowFlags_AlwaysUseWindowPadding = 1 << 30
+MAKE_ENUM(ImGuiWindowFlags_AlwaysUseWindowPadding, AlwaysUseWindowPadding)
+//    ImGuiWindowFlags_NavFlattened           = 1 << 31
+MAKE_ENUM(ImGuiWindowFlags_NavFlattened, NavFlattened)
 END_ENUM(WindowFlags)
+//enum ImGuiChildFlags_
+
+START_ENUM(ChildFlags)
+//    ImGuiChildFlags_None                    = 0
+MAKE_ENUM(ImGuiChildFlags_None, None)
+//    ImGuiChildFlags_Borders                 = 1 << 0
+MAKE_ENUM(ImGuiChildFlags_Borders, Borders)
+//    ImGuiChildFlags_AlwaysUseWindowPadding  = 1 << 1
+MAKE_ENUM(ImGuiChildFlags_AlwaysUseWindowPadding, AlwaysUseWindowPadding)
+//    ImGuiChildFlags_ResizeX                 = 1 << 2
+MAKE_ENUM(ImGuiChildFlags_ResizeX, ResizeX)
+//    ImGuiChildFlags_ResizeY                 = 1 << 3
+MAKE_ENUM(ImGuiChildFlags_ResizeY, ResizeY)
+//    ImGuiChildFlags_AutoResizeX             = 1 << 4
+MAKE_ENUM(ImGuiChildFlags_AutoResizeX, AutoResizeX)
+//    ImGuiChildFlags_AutoResizeY             = 1 << 5
+MAKE_ENUM(ImGuiChildFlags_AutoResizeY, AutoResizeY)
+//    ImGuiChildFlags_AlwaysAutoResize        = 1 << 6
+MAKE_ENUM(ImGuiChildFlags_AlwaysAutoResize, AlwaysAutoResize)
+//    ImGuiChildFlags_FrameStyle              = 1 << 7
+MAKE_ENUM(ImGuiChildFlags_FrameStyle, FrameStyle)
+//    ImGuiChildFlags_NavFlattened            = 1 << 8
+MAKE_ENUM(ImGuiChildFlags_NavFlattened, NavFlattened)
+//    ImGuiChildFlags_Border                  = ImGuiChildFlags_Borders
+MAKE_ENUM(ImGuiChildFlags_Border, Border)
+END_ENUM(ChildFlags)
+//enum ImGuiItemFlags_
+
+START_ENUM(ItemFlags)
+//    ImGuiItemFlags_None                     = 0
+MAKE_ENUM(ImGuiItemFlags_None, None)
+//    ImGuiItemFlags_NoTabStop                = 1 << 0
+MAKE_ENUM(ImGuiItemFlags_NoTabStop, NoTabStop)
+//    ImGuiItemFlags_NoNav                    = 1 << 1
+MAKE_ENUM(ImGuiItemFlags_NoNav, NoNav)
+//    ImGuiItemFlags_NoNavDefaultFocus        = 1 << 2
+MAKE_ENUM(ImGuiItemFlags_NoNavDefaultFocus, NoNavDefaultFocus)
+//    ImGuiItemFlags_ButtonRepeat             = 1 << 3
+MAKE_ENUM(ImGuiItemFlags_ButtonRepeat, ButtonRepeat)
+//    ImGuiItemFlags_AutoClosePopups          = 1 << 4
+MAKE_ENUM(ImGuiItemFlags_AutoClosePopups, AutoClosePopups)
+END_ENUM(ItemFlags)
 //enum ImGuiInputTextFlags_
 
 START_ENUM(InputTextFlags)
@@ -1848,44 +1909,48 @@ MAKE_ENUM(ImGuiInputTextFlags_None, None)
 MAKE_ENUM(ImGuiInputTextFlags_CharsDecimal, CharsDecimal)
 //    ImGuiInputTextFlags_CharsHexadecimal    = 1 << 1
 MAKE_ENUM(ImGuiInputTextFlags_CharsHexadecimal, CharsHexadecimal)
-//    ImGuiInputTextFlags_CharsUppercase      = 1 << 2
+//    ImGuiInputTextFlags_CharsScientific     = 1 << 2
+MAKE_ENUM(ImGuiInputTextFlags_CharsScientific, CharsScientific)
+//    ImGuiInputTextFlags_CharsUppercase      = 1 << 3
 MAKE_ENUM(ImGuiInputTextFlags_CharsUppercase, CharsUppercase)
-//    ImGuiInputTextFlags_CharsNoBlank        = 1 << 3
+//    ImGuiInputTextFlags_CharsNoBlank        = 1 << 4
 MAKE_ENUM(ImGuiInputTextFlags_CharsNoBlank, CharsNoBlank)
-//    ImGuiInputTextFlags_AutoSelectAll       = 1 << 4
-MAKE_ENUM(ImGuiInputTextFlags_AutoSelectAll, AutoSelectAll)
-//    ImGuiInputTextFlags_EnterReturnsTrue    = 1 << 5
-MAKE_ENUM(ImGuiInputTextFlags_EnterReturnsTrue, EnterReturnsTrue)
-//    ImGuiInputTextFlags_CallbackCompletion  = 1 << 6
-MAKE_ENUM(ImGuiInputTextFlags_CallbackCompletion, CallbackCompletion)
-//    ImGuiInputTextFlags_CallbackHistory     = 1 << 7
-MAKE_ENUM(ImGuiInputTextFlags_CallbackHistory, CallbackHistory)
-//    ImGuiInputTextFlags_CallbackAlways      = 1 << 8
-MAKE_ENUM(ImGuiInputTextFlags_CallbackAlways, CallbackAlways)
-//    ImGuiInputTextFlags_CallbackCharFilter  = 1 << 9
-MAKE_ENUM(ImGuiInputTextFlags_CallbackCharFilter, CallbackCharFilter)
-//    ImGuiInputTextFlags_AllowTabInput       = 1 << 10
+//    ImGuiInputTextFlags_AllowTabInput       = 1 << 5
 MAKE_ENUM(ImGuiInputTextFlags_AllowTabInput, AllowTabInput)
-//    ImGuiInputTextFlags_CtrlEnterForNewLine = 1 << 11
+//    ImGuiInputTextFlags_EnterReturnsTrue    = 1 << 6
+MAKE_ENUM(ImGuiInputTextFlags_EnterReturnsTrue, EnterReturnsTrue)
+//    ImGuiInputTextFlags_EscapeClearsAll     = 1 << 7
+MAKE_ENUM(ImGuiInputTextFlags_EscapeClearsAll, EscapeClearsAll)
+//    ImGuiInputTextFlags_CtrlEnterForNewLine = 1 << 8
 MAKE_ENUM(ImGuiInputTextFlags_CtrlEnterForNewLine, CtrlEnterForNewLine)
-//    ImGuiInputTextFlags_NoHorizontalScroll  = 1 << 12
-MAKE_ENUM(ImGuiInputTextFlags_NoHorizontalScroll, NoHorizontalScroll)
-//    ImGuiInputTextFlags_AlwaysOverwrite     = 1 << 13
-MAKE_ENUM(ImGuiInputTextFlags_AlwaysOverwrite, AlwaysOverwrite)
-//    ImGuiInputTextFlags_ReadOnly            = 1 << 14
+//    ImGuiInputTextFlags_ReadOnly            = 1 << 9
 MAKE_ENUM(ImGuiInputTextFlags_ReadOnly, ReadOnly)
-//    ImGuiInputTextFlags_Password            = 1 << 15
+//    ImGuiInputTextFlags_Password            = 1 << 10
 MAKE_ENUM(ImGuiInputTextFlags_Password, Password)
+//    ImGuiInputTextFlags_AlwaysOverwrite     = 1 << 11
+MAKE_ENUM(ImGuiInputTextFlags_AlwaysOverwrite, AlwaysOverwrite)
+//    ImGuiInputTextFlags_AutoSelectAll       = 1 << 12
+MAKE_ENUM(ImGuiInputTextFlags_AutoSelectAll, AutoSelectAll)
+//    ImGuiInputTextFlags_ParseEmptyRefVal    = 1 << 13
+MAKE_ENUM(ImGuiInputTextFlags_ParseEmptyRefVal, ParseEmptyRefVal)
+//    ImGuiInputTextFlags_DisplayEmptyRefVal  = 1 << 14
+MAKE_ENUM(ImGuiInputTextFlags_DisplayEmptyRefVal, DisplayEmptyRefVal)
+//    ImGuiInputTextFlags_NoHorizontalScroll  = 1 << 15
+MAKE_ENUM(ImGuiInputTextFlags_NoHorizontalScroll, NoHorizontalScroll)
 //    ImGuiInputTextFlags_NoUndoRedo          = 1 << 16
 MAKE_ENUM(ImGuiInputTextFlags_NoUndoRedo, NoUndoRedo)
-//    ImGuiInputTextFlags_CharsScientific     = 1 << 17
-MAKE_ENUM(ImGuiInputTextFlags_CharsScientific, CharsScientific)
-//    ImGuiInputTextFlags_CallbackResize      = 1 << 18
+//    ImGuiInputTextFlags_CallbackCompletion  = 1 << 17
+MAKE_ENUM(ImGuiInputTextFlags_CallbackCompletion, CallbackCompletion)
+//    ImGuiInputTextFlags_CallbackHistory     = 1 << 18
+MAKE_ENUM(ImGuiInputTextFlags_CallbackHistory, CallbackHistory)
+//    ImGuiInputTextFlags_CallbackAlways      = 1 << 19
+MAKE_ENUM(ImGuiInputTextFlags_CallbackAlways, CallbackAlways)
+//    ImGuiInputTextFlags_CallbackCharFilter  = 1 << 20
+MAKE_ENUM(ImGuiInputTextFlags_CallbackCharFilter, CallbackCharFilter)
+//    ImGuiInputTextFlags_CallbackResize      = 1 << 21
 MAKE_ENUM(ImGuiInputTextFlags_CallbackResize, CallbackResize)
-//    ImGuiInputTextFlags_CallbackEdit        = 1 << 19
+//    ImGuiInputTextFlags_CallbackEdit        = 1 << 22
 MAKE_ENUM(ImGuiInputTextFlags_CallbackEdit, CallbackEdit)
-//    ImGuiInputTextFlags_EscapeClearsAll     = 1 << 20
-MAKE_ENUM(ImGuiInputTextFlags_EscapeClearsAll, EscapeClearsAll)
 END_ENUM(InputTextFlags)
 //enum ImGuiTreeNodeFlags_
 
@@ -1918,7 +1983,11 @@ MAKE_ENUM(ImGuiTreeNodeFlags_FramePadding, FramePadding)
 MAKE_ENUM(ImGuiTreeNodeFlags_SpanAvailWidth, SpanAvailWidth)
 //    ImGuiTreeNodeFlags_SpanFullWidth        = 1 << 12
 MAKE_ENUM(ImGuiTreeNodeFlags_SpanFullWidth, SpanFullWidth)
-//    ImGuiTreeNodeFlags_NavLeftJumpsBackHere = 1 << 13
+//    ImGuiTreeNodeFlags_SpanTextWidth        = 1 << 13
+MAKE_ENUM(ImGuiTreeNodeFlags_SpanTextWidth, SpanTextWidth)
+//    ImGuiTreeNodeFlags_SpanAllColumns       = 1 << 14
+MAKE_ENUM(ImGuiTreeNodeFlags_SpanAllColumns, SpanAllColumns)
+//    ImGuiTreeNodeFlags_NavLeftJumpsBackHere = 1 << 15
 MAKE_ENUM(ImGuiTreeNodeFlags_NavLeftJumpsBackHere, NavLeftJumpsBackHere)
 //    ImGuiTreeNodeFlags_CollapsingHeader     = ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog
 MAKE_ENUM(ImGuiTreeNodeFlags_CollapsingHeader, CollapsingHeader)
@@ -1936,13 +2005,15 @@ MAKE_ENUM(ImGuiPopupFlags_MouseButtonLeft, MouseButtonLeft)
 MAKE_ENUM(ImGuiPopupFlags_MouseButtonRight, MouseButtonRight)
 //    ImGuiPopupFlags_MouseButtonMiddle       = 2
 MAKE_ENUM(ImGuiPopupFlags_MouseButtonMiddle, MouseButtonMiddle)
-//    ImGuiPopupFlags_NoOpenOverExistingPopup = 1 << 5
+//    ImGuiPopupFlags_NoReopen                = 1 << 5
+MAKE_ENUM(ImGuiPopupFlags_NoReopen, NoReopen)
+//    ImGuiPopupFlags_NoOpenOverExistingPopup = 1 << 7
 MAKE_ENUM(ImGuiPopupFlags_NoOpenOverExistingPopup, NoOpenOverExistingPopup)
-//    ImGuiPopupFlags_NoOpenOverItems         = 1 << 6
+//    ImGuiPopupFlags_NoOpenOverItems         = 1 << 8
 MAKE_ENUM(ImGuiPopupFlags_NoOpenOverItems, NoOpenOverItems)
-//    ImGuiPopupFlags_AnyPopupId              = 1 << 7
+//    ImGuiPopupFlags_AnyPopupId              = 1 << 10
 MAKE_ENUM(ImGuiPopupFlags_AnyPopupId, AnyPopupId)
-//    ImGuiPopupFlags_AnyPopupLevel           = 1 << 8
+//    ImGuiPopupFlags_AnyPopupLevel           = 1 << 11
 MAKE_ENUM(ImGuiPopupFlags_AnyPopupLevel, AnyPopupLevel)
 //    ImGuiPopupFlags_AnyPopup                = ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel
 MAKE_ENUM(ImGuiPopupFlags_AnyPopup, AnyPopup)
@@ -1952,8 +2023,8 @@ END_ENUM(PopupFlags)
 START_ENUM(SelectableFlags)
 //    ImGuiSelectableFlags_None               = 0
 MAKE_ENUM(ImGuiSelectableFlags_None, None)
-//    ImGuiSelectableFlags_DontClosePopups    = 1 << 0
-MAKE_ENUM(ImGuiSelectableFlags_DontClosePopups, DontClosePopups)
+//    ImGuiSelectableFlags_NoAutoClosePopups  = 1 << 0
+MAKE_ENUM(ImGuiSelectableFlags_NoAutoClosePopups, NoAutoClosePopups)
 //    ImGuiSelectableFlags_SpanAllColumns     = 1 << 1
 MAKE_ENUM(ImGuiSelectableFlags_SpanAllColumns, SpanAllColumns)
 //    ImGuiSelectableFlags_AllowDoubleClick   = 1 << 2
@@ -1962,6 +2033,10 @@ MAKE_ENUM(ImGuiSelectableFlags_AllowDoubleClick, AllowDoubleClick)
 MAKE_ENUM(ImGuiSelectableFlags_Disabled, Disabled)
 //    ImGuiSelectableFlags_AllowOverlap       = 1 << 4
 MAKE_ENUM(ImGuiSelectableFlags_AllowOverlap, AllowOverlap)
+//    ImGuiSelectableFlags_Highlight          = 1 << 5
+MAKE_ENUM(ImGuiSelectableFlags_Highlight, Highlight)
+//    ImGuiSelectableFlags_DontClosePopups    = ImGuiSelectableFlags_NoAutoClosePopups
+MAKE_ENUM(ImGuiSelectableFlags_DontClosePopups, DontClosePopups)
 //    ImGuiSelectableFlags_AllowItemOverlap   = ImGuiSelectableFlags_AllowOverlap
 MAKE_ENUM(ImGuiSelectableFlags_AllowItemOverlap, AllowItemOverlap)
 END_ENUM(SelectableFlags)
@@ -1984,6 +2059,8 @@ MAKE_ENUM(ImGuiComboFlags_HeightLargest, HeightLargest)
 MAKE_ENUM(ImGuiComboFlags_NoArrowButton, NoArrowButton)
 //    ImGuiComboFlags_NoPreview               = 1 << 6
 MAKE_ENUM(ImGuiComboFlags_NoPreview, NoPreview)
+//    ImGuiComboFlags_WidthFitPreview         = 1 << 7
+MAKE_ENUM(ImGuiComboFlags_WidthFitPreview, WidthFitPreview)
 END_ENUM(ComboFlags)
 //enum ImGuiTabBarFlags_
 
@@ -2002,9 +2079,11 @@ MAKE_ENUM(ImGuiTabBarFlags_NoCloseWithMiddleMouseButton, NoCloseWithMiddleMouseB
 MAKE_ENUM(ImGuiTabBarFlags_NoTabListScrollingButtons, NoTabListScrollingButtons)
 //    ImGuiTabBarFlags_NoTooltip                      = 1 << 5
 MAKE_ENUM(ImGuiTabBarFlags_NoTooltip, NoTooltip)
-//    ImGuiTabBarFlags_FittingPolicyResizeDown        = 1 << 6
+//    ImGuiTabBarFlags_DrawSelectedOverline           = 1 << 6
+MAKE_ENUM(ImGuiTabBarFlags_DrawSelectedOverline, DrawSelectedOverline)
+//    ImGuiTabBarFlags_FittingPolicyResizeDown        = 1 << 7
 MAKE_ENUM(ImGuiTabBarFlags_FittingPolicyResizeDown, FittingPolicyResizeDown)
-//    ImGuiTabBarFlags_FittingPolicyScroll            = 1 << 7
+//    ImGuiTabBarFlags_FittingPolicyScroll            = 1 << 8
 MAKE_ENUM(ImGuiTabBarFlags_FittingPolicyScroll, FittingPolicyScroll)
 END_ENUM(TabBarFlags)
 //enum ImGuiTabItemFlags_
@@ -2028,151 +2107,9 @@ MAKE_ENUM(ImGuiTabItemFlags_NoReorder, NoReorder)
 MAKE_ENUM(ImGuiTabItemFlags_Leading, Leading)
 //    ImGuiTabItemFlags_Trailing                      = 1 << 7
 MAKE_ENUM(ImGuiTabItemFlags_Trailing, Trailing)
+//    ImGuiTabItemFlags_NoAssumedClosure              = 1 << 8
+MAKE_ENUM(ImGuiTabItemFlags_NoAssumedClosure, NoAssumedClosure)
 END_ENUM(TabItemFlags)
-//enum ImGuiTableFlags_
-
-START_ENUM(TableFlags)
-//    ImGuiTableFlags_None                       = 0
-MAKE_ENUM(ImGuiTableFlags_None, None)
-//    ImGuiTableFlags_Resizable                  = 1 << 0
-MAKE_ENUM(ImGuiTableFlags_Resizable, Resizable)
-//    ImGuiTableFlags_Reorderable                = 1 << 1
-MAKE_ENUM(ImGuiTableFlags_Reorderable, Reorderable)
-//    ImGuiTableFlags_Hideable                   = 1 << 2
-MAKE_ENUM(ImGuiTableFlags_Hideable, Hideable)
-//    ImGuiTableFlags_Sortable                   = 1 << 3
-MAKE_ENUM(ImGuiTableFlags_Sortable, Sortable)
-//    ImGuiTableFlags_NoSavedSettings            = 1 << 4
-MAKE_ENUM(ImGuiTableFlags_NoSavedSettings, NoSavedSettings)
-//    ImGuiTableFlags_ContextMenuInBody          = 1 << 5
-MAKE_ENUM(ImGuiTableFlags_ContextMenuInBody, ContextMenuInBody)
-//    ImGuiTableFlags_RowBg                      = 1 << 6
-MAKE_ENUM(ImGuiTableFlags_RowBg, RowBg)
-//    ImGuiTableFlags_BordersInnerH              = 1 << 7
-MAKE_ENUM(ImGuiTableFlags_BordersInnerH, BordersInnerH)
-//    ImGuiTableFlags_BordersOuterH              = 1 << 8
-MAKE_ENUM(ImGuiTableFlags_BordersOuterH, BordersOuterH)
-//    ImGuiTableFlags_BordersInnerV              = 1 << 9
-MAKE_ENUM(ImGuiTableFlags_BordersInnerV, BordersInnerV)
-//    ImGuiTableFlags_BordersOuterV              = 1 << 10
-MAKE_ENUM(ImGuiTableFlags_BordersOuterV, BordersOuterV)
-//    ImGuiTableFlags_BordersH                   = ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_BordersOuterH
-MAKE_ENUM(ImGuiTableFlags_BordersH, BordersH)
-//    ImGuiTableFlags_BordersV                   = ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersOuterV
-MAKE_ENUM(ImGuiTableFlags_BordersV, BordersV)
-//    ImGuiTableFlags_BordersInner               = ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersInnerH
-MAKE_ENUM(ImGuiTableFlags_BordersInner, BordersInner)
-//    ImGuiTableFlags_BordersOuter               = ImGuiTableFlags_BordersOuterV | ImGuiTableFlags_BordersOuterH
-MAKE_ENUM(ImGuiTableFlags_BordersOuter, BordersOuter)
-//    ImGuiTableFlags_Borders                    = ImGuiTableFlags_BordersInner | ImGuiTableFlags_BordersOuter
-MAKE_ENUM(ImGuiTableFlags_Borders, Borders)
-//    ImGuiTableFlags_NoBordersInBody            = 1 << 11
-MAKE_ENUM(ImGuiTableFlags_NoBordersInBody, NoBordersInBody)
-//    ImGuiTableFlags_NoBordersInBodyUntilResize = 1 << 12
-MAKE_ENUM(ImGuiTableFlags_NoBordersInBodyUntilResize, NoBordersInBodyUntilResize)
-//    ImGuiTableFlags_SizingFixedFit             = 1 << 13
-MAKE_ENUM(ImGuiTableFlags_SizingFixedFit, SizingFixedFit)
-//    ImGuiTableFlags_SizingFixedSame            = 2 << 13
-MAKE_ENUM(ImGuiTableFlags_SizingFixedSame, SizingFixedSame)
-//    ImGuiTableFlags_SizingStretchProp          = 3 << 13
-MAKE_ENUM(ImGuiTableFlags_SizingStretchProp, SizingStretchProp)
-//    ImGuiTableFlags_SizingStretchSame          = 4 << 13
-MAKE_ENUM(ImGuiTableFlags_SizingStretchSame, SizingStretchSame)
-//    ImGuiTableFlags_NoHostExtendX              = 1 << 16
-MAKE_ENUM(ImGuiTableFlags_NoHostExtendX, NoHostExtendX)
-//    ImGuiTableFlags_NoHostExtendY              = 1 << 17
-MAKE_ENUM(ImGuiTableFlags_NoHostExtendY, NoHostExtendY)
-//    ImGuiTableFlags_NoKeepColumnsVisible       = 1 << 18
-MAKE_ENUM(ImGuiTableFlags_NoKeepColumnsVisible, NoKeepColumnsVisible)
-//    ImGuiTableFlags_PreciseWidths              = 1 << 19
-MAKE_ENUM(ImGuiTableFlags_PreciseWidths, PreciseWidths)
-//    ImGuiTableFlags_NoClip                     = 1 << 20
-MAKE_ENUM(ImGuiTableFlags_NoClip, NoClip)
-//    ImGuiTableFlags_PadOuterX                  = 1 << 21
-MAKE_ENUM(ImGuiTableFlags_PadOuterX, PadOuterX)
-//    ImGuiTableFlags_NoPadOuterX                = 1 << 22
-MAKE_ENUM(ImGuiTableFlags_NoPadOuterX, NoPadOuterX)
-//    ImGuiTableFlags_NoPadInnerX                = 1 << 23
-MAKE_ENUM(ImGuiTableFlags_NoPadInnerX, NoPadInnerX)
-//    ImGuiTableFlags_ScrollX                    = 1 << 24
-MAKE_ENUM(ImGuiTableFlags_ScrollX, ScrollX)
-//    ImGuiTableFlags_ScrollY                    = 1 << 25
-MAKE_ENUM(ImGuiTableFlags_ScrollY, ScrollY)
-//    ImGuiTableFlags_SortMulti                  = 1 << 26
-MAKE_ENUM(ImGuiTableFlags_SortMulti, SortMulti)
-//    ImGuiTableFlags_SortTristate               = 1 << 27
-MAKE_ENUM(ImGuiTableFlags_SortTristate, SortTristate)
-END_ENUM(TableFlags)
-//enum ImGuiTableColumnFlags_
-
-START_ENUM(TableColumnFlags)
-//    ImGuiTableColumnFlags_None                  = 0
-MAKE_ENUM(ImGuiTableColumnFlags_None, None)
-//    ImGuiTableColumnFlags_Disabled              = 1 << 0
-MAKE_ENUM(ImGuiTableColumnFlags_Disabled, Disabled)
-//    ImGuiTableColumnFlags_DefaultHide           = 1 << 1
-MAKE_ENUM(ImGuiTableColumnFlags_DefaultHide, DefaultHide)
-//    ImGuiTableColumnFlags_DefaultSort           = 1 << 2
-MAKE_ENUM(ImGuiTableColumnFlags_DefaultSort, DefaultSort)
-//    ImGuiTableColumnFlags_WidthStretch          = 1 << 3
-MAKE_ENUM(ImGuiTableColumnFlags_WidthStretch, WidthStretch)
-//    ImGuiTableColumnFlags_WidthFixed            = 1 << 4
-MAKE_ENUM(ImGuiTableColumnFlags_WidthFixed, WidthFixed)
-//    ImGuiTableColumnFlags_NoResize              = 1 << 5
-MAKE_ENUM(ImGuiTableColumnFlags_NoResize, NoResize)
-//    ImGuiTableColumnFlags_NoReorder             = 1 << 6
-MAKE_ENUM(ImGuiTableColumnFlags_NoReorder, NoReorder)
-//    ImGuiTableColumnFlags_NoHide                = 1 << 7
-MAKE_ENUM(ImGuiTableColumnFlags_NoHide, NoHide)
-//    ImGuiTableColumnFlags_NoClip                = 1 << 8
-MAKE_ENUM(ImGuiTableColumnFlags_NoClip, NoClip)
-//    ImGuiTableColumnFlags_NoSort                = 1 << 9
-MAKE_ENUM(ImGuiTableColumnFlags_NoSort, NoSort)
-//    ImGuiTableColumnFlags_NoSortAscending       = 1 << 10
-MAKE_ENUM(ImGuiTableColumnFlags_NoSortAscending, NoSortAscending)
-//    ImGuiTableColumnFlags_NoSortDescending      = 1 << 11
-MAKE_ENUM(ImGuiTableColumnFlags_NoSortDescending, NoSortDescending)
-//    ImGuiTableColumnFlags_NoHeaderLabel         = 1 << 12
-MAKE_ENUM(ImGuiTableColumnFlags_NoHeaderLabel, NoHeaderLabel)
-//    ImGuiTableColumnFlags_NoHeaderWidth         = 1 << 13
-MAKE_ENUM(ImGuiTableColumnFlags_NoHeaderWidth, NoHeaderWidth)
-//    ImGuiTableColumnFlags_PreferSortAscending   = 1 << 14
-MAKE_ENUM(ImGuiTableColumnFlags_PreferSortAscending, PreferSortAscending)
-//    ImGuiTableColumnFlags_PreferSortDescending  = 1 << 15
-MAKE_ENUM(ImGuiTableColumnFlags_PreferSortDescending, PreferSortDescending)
-//    ImGuiTableColumnFlags_IndentEnable          = 1 << 16
-MAKE_ENUM(ImGuiTableColumnFlags_IndentEnable, IndentEnable)
-//    ImGuiTableColumnFlags_IndentDisable         = 1 << 17
-MAKE_ENUM(ImGuiTableColumnFlags_IndentDisable, IndentDisable)
-//    ImGuiTableColumnFlags_IsEnabled             = 1 << 24
-MAKE_ENUM(ImGuiTableColumnFlags_IsEnabled, IsEnabled)
-//    ImGuiTableColumnFlags_IsVisible             = 1 << 25
-MAKE_ENUM(ImGuiTableColumnFlags_IsVisible, IsVisible)
-//    ImGuiTableColumnFlags_IsSorted              = 1 << 26
-MAKE_ENUM(ImGuiTableColumnFlags_IsSorted, IsSorted)
-//    ImGuiTableColumnFlags_IsHovered             = 1 << 27
-MAKE_ENUM(ImGuiTableColumnFlags_IsHovered, IsHovered)
-END_ENUM(TableColumnFlags)
-//enum ImGuiTableRowFlags_
-
-START_ENUM(TableRowFlags)
-//    ImGuiTableRowFlags_None                     = 0
-MAKE_ENUM(ImGuiTableRowFlags_None, None)
-//    ImGuiTableRowFlags_Headers                  = 1 << 0
-MAKE_ENUM(ImGuiTableRowFlags_Headers, Headers)
-END_ENUM(TableRowFlags)
-//enum ImGuiTableBgTarget_
-
-START_ENUM(TableBgTarget)
-//    ImGuiTableBgTarget_None                     = 0
-MAKE_ENUM(ImGuiTableBgTarget_None, None)
-//    ImGuiTableBgTarget_RowBg0                   = 1
-MAKE_ENUM(ImGuiTableBgTarget_RowBg0, RowBg0)
-//    ImGuiTableBgTarget_RowBg1                   = 2
-MAKE_ENUM(ImGuiTableBgTarget_RowBg1, RowBg1)
-//    ImGuiTableBgTarget_CellBg                   = 3
-MAKE_ENUM(ImGuiTableBgTarget_CellBg, CellBg)
-END_ENUM(TableBgTarget)
 //enum ImGuiFocusedFlags_
 
 START_ENUM(FocusedFlags)
@@ -2248,8 +2185,12 @@ MAKE_ENUM(ImGuiDragDropFlags_SourceNoHoldToOpenOthers, SourceNoHoldToOpenOthers)
 MAKE_ENUM(ImGuiDragDropFlags_SourceAllowNullID, SourceAllowNullID)
 //    ImGuiDragDropFlags_SourceExtern                 = 1 << 4
 MAKE_ENUM(ImGuiDragDropFlags_SourceExtern, SourceExtern)
-//    ImGuiDragDropFlags_SourceAutoExpirePayload      = 1 << 5
-MAKE_ENUM(ImGuiDragDropFlags_SourceAutoExpirePayload, SourceAutoExpirePayload)
+//    ImGuiDragDropFlags_PayloadAutoExpire            = 1 << 5
+MAKE_ENUM(ImGuiDragDropFlags_PayloadAutoExpire, PayloadAutoExpire)
+//    ImGuiDragDropFlags_PayloadNoCrossContext        = 1 << 6
+MAKE_ENUM(ImGuiDragDropFlags_PayloadNoCrossContext, PayloadNoCrossContext)
+//    ImGuiDragDropFlags_PayloadNoCrossProcess        = 1 << 7
+MAKE_ENUM(ImGuiDragDropFlags_PayloadNoCrossProcess, PayloadNoCrossProcess)
 //    ImGuiDragDropFlags_AcceptBeforeDelivery         = 1 << 10
 MAKE_ENUM(ImGuiDragDropFlags_AcceptBeforeDelivery, AcceptBeforeDelivery)
 //    ImGuiDragDropFlags_AcceptNoDrawDefaultRect      = 1 << 11
@@ -2258,6 +2199,8 @@ MAKE_ENUM(ImGuiDragDropFlags_AcceptNoDrawDefaultRect, AcceptNoDrawDefaultRect)
 MAKE_ENUM(ImGuiDragDropFlags_AcceptNoPreviewTooltip, AcceptNoPreviewTooltip)
 //    ImGuiDragDropFlags_AcceptPeekOnly               = ImGuiDragDropFlags_AcceptBeforeDelivery | ImGuiDragDropFlags_AcceptNoDrawDefaultRect
 MAKE_ENUM(ImGuiDragDropFlags_AcceptPeekOnly, AcceptPeekOnly)
+//    ImGuiDragDropFlags_SourceAutoExpirePayload = ImGuiDragDropFlags_PayloadAutoExpire
+MAKE_ENUM(ImGuiDragDropFlags_SourceAutoExpirePayload, SourceAutoExpirePayload)
 END_ENUM(DragDropFlags)
 //enum ImGuiDataType_
 
@@ -2282,10 +2225,12 @@ MAKE_ENUM(ImGuiDataType_U64, U64)
 MAKE_ENUM(ImGuiDataType_Float, Float)
 //    ImGuiDataType_Double
 MAKE_ENUM(ImGuiDataType_Double, Double)
+//    ImGuiDataType_Bool
+MAKE_ENUM(ImGuiDataType_Bool, Bool)
 //    ImGuiDataType_COUNT
 MAKE_ENUM(ImGuiDataType_COUNT, COUNT)
 END_ENUM(DataType)
-//enum ImGuiDir_
+//enum ImGuiDir : int
 
 START_ENUM(Dir)
 //    ImGuiDir_None    = -1
@@ -2301,7 +2246,7 @@ MAKE_ENUM(ImGuiDir_Down, Down)
 //    ImGuiDir_COUNT
 MAKE_ENUM(ImGuiDir_COUNT, COUNT)
 END_ENUM(Dir)
-//enum ImGuiSortDirection_
+//enum ImGuiSortDirection : ImU8
 
 START_ENUM(SortDirection)
 //    ImGuiSortDirection_None         = 0
@@ -2460,6 +2405,30 @@ MAKE_ENUM(ImGuiKey_F10, F10)
 MAKE_ENUM(ImGuiKey_F11, F11)
 // ImGuiKey_F12
 MAKE_ENUM(ImGuiKey_F12, F12)
+//    ImGuiKey_F13
+MAKE_ENUM(ImGuiKey_F13, F13)
+// ImGuiKey_F14
+MAKE_ENUM(ImGuiKey_F14, F14)
+// ImGuiKey_F15
+MAKE_ENUM(ImGuiKey_F15, F15)
+// ImGuiKey_F16
+MAKE_ENUM(ImGuiKey_F16, F16)
+// ImGuiKey_F17
+MAKE_ENUM(ImGuiKey_F17, F17)
+// ImGuiKey_F18
+MAKE_ENUM(ImGuiKey_F18, F18)
+//    ImGuiKey_F19
+MAKE_ENUM(ImGuiKey_F19, F19)
+// ImGuiKey_F20
+MAKE_ENUM(ImGuiKey_F20, F20)
+// ImGuiKey_F21
+MAKE_ENUM(ImGuiKey_F21, F21)
+// ImGuiKey_F22
+MAKE_ENUM(ImGuiKey_F22, F22)
+// ImGuiKey_F23
+MAKE_ENUM(ImGuiKey_F23, F23)
+// ImGuiKey_F24
+MAKE_ENUM(ImGuiKey_F24, F24)
 //    ImGuiKey_Apostrophe
 MAKE_ENUM(ImGuiKey_Apostrophe, Apostrophe)
 //    ImGuiKey_Comma
@@ -2526,6 +2495,10 @@ MAKE_ENUM(ImGuiKey_KeypadAdd, KeypadAdd)
 MAKE_ENUM(ImGuiKey_KeypadEnter, KeypadEnter)
 //    ImGuiKey_KeypadEqual
 MAKE_ENUM(ImGuiKey_KeypadEqual, KeypadEqual)
+//    ImGuiKey_AppBack
+MAKE_ENUM(ImGuiKey_AppBack, AppBack)
+//    ImGuiKey_AppForward
+MAKE_ENUM(ImGuiKey_AppForward, AppForward)
 //    ImGuiKey_GamepadStart
 MAKE_ENUM(ImGuiKey_GamepadStart, GamepadStart)
 //    ImGuiKey_GamepadBack
@@ -2608,7 +2581,7 @@ MAKE_ENUM(ImGuiMod_Shift, Shift)
 MAKE_ENUM(ImGuiMod_Alt, Alt)
 //    ImGuiMod_Super                  = 1 << 15
 MAKE_ENUM(ImGuiMod_Super, Super)
-//    ImGuiMod_Shortcut               = 1 << 11
+//    ImGuiMod_Shortcut               = ImGuiMod_Ctrl
 MAKE_ENUM(ImGuiMod_Shortcut, Shortcut)
 //    ImGuiKey_ModCtrl = ImGuiMod_Ctrl
 MAKE_ENUM(ImGuiKey_ModCtrl, ModCtrl)
@@ -2618,9 +2591,33 @@ MAKE_ENUM(ImGuiKey_ModShift, ModShift)
 MAKE_ENUM(ImGuiKey_ModAlt, ModAlt)
 // ImGuiKey_ModSuper = ImGuiMod_Super
 MAKE_ENUM(ImGuiKey_ModSuper, ModSuper)
-//    ImGuiKey_KeyPadEnter = ImGuiKey_KeypadEnter
-MAKE_ENUM(ImGuiKey_KeyPadEnter, KeyPadEnter)
 END_ENUM(Key)
+//enum ImGuiInputFlags_
+
+START_ENUM(InputFlags)
+//    ImGuiInputFlags_None                    = 0
+MAKE_ENUM(ImGuiInputFlags_None, None)
+//    ImGuiInputFlags_Repeat                  = 1 << 0
+MAKE_ENUM(ImGuiInputFlags_Repeat, Repeat)
+//    ImGuiInputFlags_RouteActive             = 1 << 10
+MAKE_ENUM(ImGuiInputFlags_RouteActive, RouteActive)
+//    ImGuiInputFlags_RouteFocused            = 1 << 11
+MAKE_ENUM(ImGuiInputFlags_RouteFocused, RouteFocused)
+//    ImGuiInputFlags_RouteGlobal             = 1 << 12
+MAKE_ENUM(ImGuiInputFlags_RouteGlobal, RouteGlobal)
+//    ImGuiInputFlags_RouteAlways             = 1 << 13
+MAKE_ENUM(ImGuiInputFlags_RouteAlways, RouteAlways)
+//    ImGuiInputFlags_RouteOverFocused        = 1 << 14
+MAKE_ENUM(ImGuiInputFlags_RouteOverFocused, RouteOverFocused)
+//    ImGuiInputFlags_RouteOverActive         = 1 << 15
+MAKE_ENUM(ImGuiInputFlags_RouteOverActive, RouteOverActive)
+//    ImGuiInputFlags_RouteUnlessBgFocused    = 1 << 16
+MAKE_ENUM(ImGuiInputFlags_RouteUnlessBgFocused, RouteUnlessBgFocused)
+//    ImGuiInputFlags_RouteFromRootWindow     = 1 << 17
+MAKE_ENUM(ImGuiInputFlags_RouteFromRootWindow, RouteFromRootWindow)
+//    ImGuiInputFlags_Tooltip                 = 1 << 18
+MAKE_ENUM(ImGuiInputFlags_Tooltip, Tooltip)
+END_ENUM(InputFlags)
 //enum ImGuiNavInput
 
 START_ENUM(NavInput)
@@ -2676,6 +2673,8 @@ MAKE_ENUM(ImGuiConfigFlags_NavNoCaptureKeyboard, NavNoCaptureKeyboard)
 MAKE_ENUM(ImGuiConfigFlags_NoMouse, NoMouse)
 //    ImGuiConfigFlags_NoMouseCursorChange    = 1 << 5
 MAKE_ENUM(ImGuiConfigFlags_NoMouseCursorChange, NoMouseCursorChange)
+//    ImGuiConfigFlags_NoKeyboard             = 1 << 6
+MAKE_ENUM(ImGuiConfigFlags_NoKeyboard, NoKeyboard)
 //    ImGuiConfigFlags_IsSRGB                 = 1 << 20
 MAKE_ENUM(ImGuiConfigFlags_IsSRGB, IsSRGB)
 //    ImGuiConfigFlags_IsTouchScreen          = 1 << 21
@@ -2764,16 +2763,20 @@ MAKE_ENUM(ImGuiCol_ResizeGrip, ResizeGrip)
 MAKE_ENUM(ImGuiCol_ResizeGripHovered, ResizeGripHovered)
 //    ImGuiCol_ResizeGripActive
 MAKE_ENUM(ImGuiCol_ResizeGripActive, ResizeGripActive)
-//    ImGuiCol_Tab
-MAKE_ENUM(ImGuiCol_Tab, Tab)
 //    ImGuiCol_TabHovered
 MAKE_ENUM(ImGuiCol_TabHovered, TabHovered)
-//    ImGuiCol_TabActive
-MAKE_ENUM(ImGuiCol_TabActive, TabActive)
-//    ImGuiCol_TabUnfocused
-MAKE_ENUM(ImGuiCol_TabUnfocused, TabUnfocused)
-//    ImGuiCol_TabUnfocusedActive
-MAKE_ENUM(ImGuiCol_TabUnfocusedActive, TabUnfocusedActive)
+//    ImGuiCol_Tab
+MAKE_ENUM(ImGuiCol_Tab, Tab)
+//    ImGuiCol_TabSelected
+MAKE_ENUM(ImGuiCol_TabSelected, TabSelected)
+//    ImGuiCol_TabSelectedOverline
+MAKE_ENUM(ImGuiCol_TabSelectedOverline, TabSelectedOverline)
+//    ImGuiCol_TabDimmed
+MAKE_ENUM(ImGuiCol_TabDimmed, TabDimmed)
+//    ImGuiCol_TabDimmedSelected
+MAKE_ENUM(ImGuiCol_TabDimmedSelected, TabDimmedSelected)
+//    ImGuiCol_TabDimmedSelectedOverline
+MAKE_ENUM(ImGuiCol_TabDimmedSelectedOverline, TabDimmedSelectedOverline)
 //    ImGuiCol_PlotLines
 MAKE_ENUM(ImGuiCol_PlotLines, PlotLines)
 //    ImGuiCol_PlotLinesHovered
@@ -2792,6 +2795,8 @@ MAKE_ENUM(ImGuiCol_TableBorderLight, TableBorderLight)
 MAKE_ENUM(ImGuiCol_TableRowBg, TableRowBg)
 //    ImGuiCol_TableRowBgAlt
 MAKE_ENUM(ImGuiCol_TableRowBgAlt, TableRowBgAlt)
+//    ImGuiCol_TextLink
+MAKE_ENUM(ImGuiCol_TextLink, TextLink)
 //    ImGuiCol_TextSelectedBg
 MAKE_ENUM(ImGuiCol_TextSelectedBg, TextSelectedBg)
 //    ImGuiCol_DragDropTarget
@@ -2806,6 +2811,12 @@ MAKE_ENUM(ImGuiCol_NavWindowingDimBg, NavWindowingDimBg)
 MAKE_ENUM(ImGuiCol_ModalWindowDimBg, ModalWindowDimBg)
 //    ImGuiCol_COUNT
 MAKE_ENUM(ImGuiCol_COUNT, COUNT)
+//    ImGuiCol_TabActive = ImGuiCol_TabSelected
+MAKE_ENUM(ImGuiCol_TabActive, TabActive)
+//    ImGuiCol_TabUnfocused = ImGuiCol_TabDimmed
+MAKE_ENUM(ImGuiCol_TabUnfocused, TabUnfocused)
+//    ImGuiCol_TabUnfocusedActive = ImGuiCol_TabDimmedSelected
+MAKE_ENUM(ImGuiCol_TabUnfocusedActive, TabUnfocusedActive)
 END_ENUM(Col)
 //enum ImGuiStyleVar_
 
@@ -2856,6 +2867,16 @@ MAKE_ENUM(ImGuiStyleVar_GrabMinSize, GrabMinSize)
 MAKE_ENUM(ImGuiStyleVar_GrabRounding, GrabRounding)
 //    ImGuiStyleVar_TabRounding
 MAKE_ENUM(ImGuiStyleVar_TabRounding, TabRounding)
+//    ImGuiStyleVar_TabBorderSize
+MAKE_ENUM(ImGuiStyleVar_TabBorderSize, TabBorderSize)
+//    ImGuiStyleVar_TabBarBorderSize
+MAKE_ENUM(ImGuiStyleVar_TabBarBorderSize, TabBarBorderSize)
+//    ImGuiStyleVar_TabBarOverlineSize
+MAKE_ENUM(ImGuiStyleVar_TabBarOverlineSize, TabBarOverlineSize)
+//    ImGuiStyleVar_TableAngledHeadersAngle
+MAKE_ENUM(ImGuiStyleVar_TableAngledHeadersAngle, TableAngledHeadersAngle)
+//    ImGuiStyleVar_TableAngledHeadersTextAlign
+MAKE_ENUM(ImGuiStyleVar_TableAngledHeadersTextAlign, TableAngledHeadersTextAlign)
 //    ImGuiStyleVar_ButtonTextAlign
 MAKE_ENUM(ImGuiStyleVar_ButtonTextAlign, ButtonTextAlign)
 //    ImGuiStyleVar_SelectableTextAlign
@@ -2946,6 +2967,8 @@ MAKE_ENUM(ImGuiSliderFlags_Logarithmic, Logarithmic)
 MAKE_ENUM(ImGuiSliderFlags_NoRoundToFormat, NoRoundToFormat)
 //    ImGuiSliderFlags_NoInput                = 1 << 7
 MAKE_ENUM(ImGuiSliderFlags_NoInput, NoInput)
+//    ImGuiSliderFlags_WrapAround             = 1 << 8
+MAKE_ENUM(ImGuiSliderFlags_WrapAround, WrapAround)
 END_ENUM(SliderFlags)
 //enum ImGuiMouseButton_
 
@@ -3011,6 +3034,158 @@ MAKE_ENUM(ImGuiCond_FirstUseEver, FirstUseEver)
 //    ImGuiCond_Appearing     = 1 << 3
 MAKE_ENUM(ImGuiCond_Appearing, Appearing)
 END_ENUM(Cond)
+//enum ImGuiTableFlags_
+
+START_ENUM(TableFlags)
+//    ImGuiTableFlags_None                       = 0
+MAKE_ENUM(ImGuiTableFlags_None, None)
+//    ImGuiTableFlags_Resizable                  = 1 << 0
+MAKE_ENUM(ImGuiTableFlags_Resizable, Resizable)
+//    ImGuiTableFlags_Reorderable                = 1 << 1
+MAKE_ENUM(ImGuiTableFlags_Reorderable, Reorderable)
+//    ImGuiTableFlags_Hideable                   = 1 << 2
+MAKE_ENUM(ImGuiTableFlags_Hideable, Hideable)
+//    ImGuiTableFlags_Sortable                   = 1 << 3
+MAKE_ENUM(ImGuiTableFlags_Sortable, Sortable)
+//    ImGuiTableFlags_NoSavedSettings            = 1 << 4
+MAKE_ENUM(ImGuiTableFlags_NoSavedSettings, NoSavedSettings)
+//    ImGuiTableFlags_ContextMenuInBody          = 1 << 5
+MAKE_ENUM(ImGuiTableFlags_ContextMenuInBody, ContextMenuInBody)
+//    ImGuiTableFlags_RowBg                      = 1 << 6
+MAKE_ENUM(ImGuiTableFlags_RowBg, RowBg)
+//    ImGuiTableFlags_BordersInnerH              = 1 << 7
+MAKE_ENUM(ImGuiTableFlags_BordersInnerH, BordersInnerH)
+//    ImGuiTableFlags_BordersOuterH              = 1 << 8
+MAKE_ENUM(ImGuiTableFlags_BordersOuterH, BordersOuterH)
+//    ImGuiTableFlags_BordersInnerV              = 1 << 9
+MAKE_ENUM(ImGuiTableFlags_BordersInnerV, BordersInnerV)
+//    ImGuiTableFlags_BordersOuterV              = 1 << 10
+MAKE_ENUM(ImGuiTableFlags_BordersOuterV, BordersOuterV)
+//    ImGuiTableFlags_BordersH                   = ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_BordersOuterH
+MAKE_ENUM(ImGuiTableFlags_BordersH, BordersH)
+//    ImGuiTableFlags_BordersV                   = ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersOuterV
+MAKE_ENUM(ImGuiTableFlags_BordersV, BordersV)
+//    ImGuiTableFlags_BordersInner               = ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersInnerH
+MAKE_ENUM(ImGuiTableFlags_BordersInner, BordersInner)
+//    ImGuiTableFlags_BordersOuter               = ImGuiTableFlags_BordersOuterV | ImGuiTableFlags_BordersOuterH
+MAKE_ENUM(ImGuiTableFlags_BordersOuter, BordersOuter)
+//    ImGuiTableFlags_Borders                    = ImGuiTableFlags_BordersInner | ImGuiTableFlags_BordersOuter
+MAKE_ENUM(ImGuiTableFlags_Borders, Borders)
+//    ImGuiTableFlags_NoBordersInBody            = 1 << 11
+MAKE_ENUM(ImGuiTableFlags_NoBordersInBody, NoBordersInBody)
+//    ImGuiTableFlags_NoBordersInBodyUntilResize = 1 << 12
+MAKE_ENUM(ImGuiTableFlags_NoBordersInBodyUntilResize, NoBordersInBodyUntilResize)
+//    ImGuiTableFlags_SizingFixedFit             = 1 << 13
+MAKE_ENUM(ImGuiTableFlags_SizingFixedFit, SizingFixedFit)
+//    ImGuiTableFlags_SizingFixedSame            = 2 << 13
+MAKE_ENUM(ImGuiTableFlags_SizingFixedSame, SizingFixedSame)
+//    ImGuiTableFlags_SizingStretchProp          = 3 << 13
+MAKE_ENUM(ImGuiTableFlags_SizingStretchProp, SizingStretchProp)
+//    ImGuiTableFlags_SizingStretchSame          = 4 << 13
+MAKE_ENUM(ImGuiTableFlags_SizingStretchSame, SizingStretchSame)
+//    ImGuiTableFlags_NoHostExtendX              = 1 << 16
+MAKE_ENUM(ImGuiTableFlags_NoHostExtendX, NoHostExtendX)
+//    ImGuiTableFlags_NoHostExtendY              = 1 << 17
+MAKE_ENUM(ImGuiTableFlags_NoHostExtendY, NoHostExtendY)
+//    ImGuiTableFlags_NoKeepColumnsVisible       = 1 << 18
+MAKE_ENUM(ImGuiTableFlags_NoKeepColumnsVisible, NoKeepColumnsVisible)
+//    ImGuiTableFlags_PreciseWidths              = 1 << 19
+MAKE_ENUM(ImGuiTableFlags_PreciseWidths, PreciseWidths)
+//    ImGuiTableFlags_NoClip                     = 1 << 20
+MAKE_ENUM(ImGuiTableFlags_NoClip, NoClip)
+//    ImGuiTableFlags_PadOuterX                  = 1 << 21
+MAKE_ENUM(ImGuiTableFlags_PadOuterX, PadOuterX)
+//    ImGuiTableFlags_NoPadOuterX                = 1 << 22
+MAKE_ENUM(ImGuiTableFlags_NoPadOuterX, NoPadOuterX)
+//    ImGuiTableFlags_NoPadInnerX                = 1 << 23
+MAKE_ENUM(ImGuiTableFlags_NoPadInnerX, NoPadInnerX)
+//    ImGuiTableFlags_ScrollX                    = 1 << 24
+MAKE_ENUM(ImGuiTableFlags_ScrollX, ScrollX)
+//    ImGuiTableFlags_ScrollY                    = 1 << 25
+MAKE_ENUM(ImGuiTableFlags_ScrollY, ScrollY)
+//    ImGuiTableFlags_SortMulti                  = 1 << 26
+MAKE_ENUM(ImGuiTableFlags_SortMulti, SortMulti)
+//    ImGuiTableFlags_SortTristate               = 1 << 27
+MAKE_ENUM(ImGuiTableFlags_SortTristate, SortTristate)
+//    ImGuiTableFlags_HighlightHoveredColumn     = 1 << 28
+MAKE_ENUM(ImGuiTableFlags_HighlightHoveredColumn, HighlightHoveredColumn)
+END_ENUM(TableFlags)
+//enum ImGuiTableColumnFlags_
+
+START_ENUM(TableColumnFlags)
+//    ImGuiTableColumnFlags_None                  = 0
+MAKE_ENUM(ImGuiTableColumnFlags_None, None)
+//    ImGuiTableColumnFlags_Disabled              = 1 << 0
+MAKE_ENUM(ImGuiTableColumnFlags_Disabled, Disabled)
+//    ImGuiTableColumnFlags_DefaultHide           = 1 << 1
+MAKE_ENUM(ImGuiTableColumnFlags_DefaultHide, DefaultHide)
+//    ImGuiTableColumnFlags_DefaultSort           = 1 << 2
+MAKE_ENUM(ImGuiTableColumnFlags_DefaultSort, DefaultSort)
+//    ImGuiTableColumnFlags_WidthStretch          = 1 << 3
+MAKE_ENUM(ImGuiTableColumnFlags_WidthStretch, WidthStretch)
+//    ImGuiTableColumnFlags_WidthFixed            = 1 << 4
+MAKE_ENUM(ImGuiTableColumnFlags_WidthFixed, WidthFixed)
+//    ImGuiTableColumnFlags_NoResize              = 1 << 5
+MAKE_ENUM(ImGuiTableColumnFlags_NoResize, NoResize)
+//    ImGuiTableColumnFlags_NoReorder             = 1 << 6
+MAKE_ENUM(ImGuiTableColumnFlags_NoReorder, NoReorder)
+//    ImGuiTableColumnFlags_NoHide                = 1 << 7
+MAKE_ENUM(ImGuiTableColumnFlags_NoHide, NoHide)
+//    ImGuiTableColumnFlags_NoClip                = 1 << 8
+MAKE_ENUM(ImGuiTableColumnFlags_NoClip, NoClip)
+//    ImGuiTableColumnFlags_NoSort                = 1 << 9
+MAKE_ENUM(ImGuiTableColumnFlags_NoSort, NoSort)
+//    ImGuiTableColumnFlags_NoSortAscending       = 1 << 10
+MAKE_ENUM(ImGuiTableColumnFlags_NoSortAscending, NoSortAscending)
+//    ImGuiTableColumnFlags_NoSortDescending      = 1 << 11
+MAKE_ENUM(ImGuiTableColumnFlags_NoSortDescending, NoSortDescending)
+//    ImGuiTableColumnFlags_NoHeaderLabel         = 1 << 12
+MAKE_ENUM(ImGuiTableColumnFlags_NoHeaderLabel, NoHeaderLabel)
+//    ImGuiTableColumnFlags_NoHeaderWidth         = 1 << 13
+MAKE_ENUM(ImGuiTableColumnFlags_NoHeaderWidth, NoHeaderWidth)
+//    ImGuiTableColumnFlags_PreferSortAscending   = 1 << 14
+MAKE_ENUM(ImGuiTableColumnFlags_PreferSortAscending, PreferSortAscending)
+//    ImGuiTableColumnFlags_PreferSortDescending  = 1 << 15
+MAKE_ENUM(ImGuiTableColumnFlags_PreferSortDescending, PreferSortDescending)
+//    ImGuiTableColumnFlags_IndentEnable          = 1 << 16
+MAKE_ENUM(ImGuiTableColumnFlags_IndentEnable, IndentEnable)
+//    ImGuiTableColumnFlags_IndentDisable         = 1 << 17
+MAKE_ENUM(ImGuiTableColumnFlags_IndentDisable, IndentDisable)
+//    ImGuiTableColumnFlags_AngledHeader          = 1 << 18
+MAKE_ENUM(ImGuiTableColumnFlags_AngledHeader, AngledHeader)
+//    ImGuiTableColumnFlags_IsEnabled             = 1 << 24
+MAKE_ENUM(ImGuiTableColumnFlags_IsEnabled, IsEnabled)
+//    ImGuiTableColumnFlags_IsVisible             = 1 << 25
+MAKE_ENUM(ImGuiTableColumnFlags_IsVisible, IsVisible)
+//    ImGuiTableColumnFlags_IsSorted              = 1 << 26
+MAKE_ENUM(ImGuiTableColumnFlags_IsSorted, IsSorted)
+//    ImGuiTableColumnFlags_IsHovered             = 1 << 27
+MAKE_ENUM(ImGuiTableColumnFlags_IsHovered, IsHovered)
+END_ENUM(TableColumnFlags)
+//enum ImGuiTableRowFlags_
+
+START_ENUM(TableRowFlags)
+//    ImGuiTableRowFlags_None                     = 0
+MAKE_ENUM(ImGuiTableRowFlags_None, None)
+//    ImGuiTableRowFlags_Headers                  = 1 << 0
+MAKE_ENUM(ImGuiTableRowFlags_Headers, Headers)
+END_ENUM(TableRowFlags)
+//enum ImGuiTableBgTarget_
+
+START_ENUM(TableBgTarget)
+//    ImGuiTableBgTarget_None                     = 0
+MAKE_ENUM(ImGuiTableBgTarget_None, None)
+//    ImGuiTableBgTarget_RowBg0                   = 1
+MAKE_ENUM(ImGuiTableBgTarget_RowBg0, RowBg0)
+//    ImGuiTableBgTarget_RowBg1                   = 2
+MAKE_ENUM(ImGuiTableBgTarget_RowBg1, RowBg1)
+//    ImGuiTableBgTarget_CellBg                   = 3
+MAKE_ENUM(ImGuiTableBgTarget_CellBg, CellBg)
+END_ENUM(TableBgTarget)
+//struct ImGuiTableSortSpecs
+
+//struct ImGuiTableColumnSortSpecs
+
 //struct ImVector
 
 //struct ImGuiStyle
@@ -3025,10 +3200,6 @@ END_ENUM(Cond)
 
 //struct ImGuiPayload
 
-//struct ImGuiTableColumnSortSpecs
-
-//struct ImGuiTableSortSpecs
-
 //struct ImGuiOnceUponAFrame
 
 //struct ImGuiTextFilter
@@ -3037,13 +3208,69 @@ END_ENUM(Cond)
 
 //struct ImGuiTextBuffer
 
-//struct ImGuiStorage
+//struct ImGuiStoragePair
 
-//    struct ImGuiStoragePair
+//struct ImGuiStorage
 
 //struct ImGuiListClipper
 
 //struct ImColor
+
+//enum ImGuiMultiSelectFlags_
+
+START_ENUM(MultiSelectFlags)
+//    ImGuiMultiSelectFlags_None                  = 0
+MAKE_ENUM(ImGuiMultiSelectFlags_None, None)
+//    ImGuiMultiSelectFlags_SingleSelect          = 1 << 0
+MAKE_ENUM(ImGuiMultiSelectFlags_SingleSelect, SingleSelect)
+//    ImGuiMultiSelectFlags_NoSelectAll           = 1 << 1
+MAKE_ENUM(ImGuiMultiSelectFlags_NoSelectAll, NoSelectAll)
+//    ImGuiMultiSelectFlags_NoRangeSelect         = 1 << 2
+MAKE_ENUM(ImGuiMultiSelectFlags_NoRangeSelect, NoRangeSelect)
+//    ImGuiMultiSelectFlags_NoAutoSelect          = 1 << 3
+MAKE_ENUM(ImGuiMultiSelectFlags_NoAutoSelect, NoAutoSelect)
+//    ImGuiMultiSelectFlags_NoAutoClear           = 1 << 4
+MAKE_ENUM(ImGuiMultiSelectFlags_NoAutoClear, NoAutoClear)
+//    ImGuiMultiSelectFlags_NoAutoClearOnReselect = 1 << 5
+MAKE_ENUM(ImGuiMultiSelectFlags_NoAutoClearOnReselect, NoAutoClearOnReselect)
+//    ImGuiMultiSelectFlags_BoxSelect1d           = 1 << 6
+MAKE_ENUM(ImGuiMultiSelectFlags_BoxSelect1d, BoxSelect1d)
+//    ImGuiMultiSelectFlags_BoxSelect2d           = 1 << 7
+MAKE_ENUM(ImGuiMultiSelectFlags_BoxSelect2d, BoxSelect2d)
+//    ImGuiMultiSelectFlags_BoxSelectNoScroll     = 1 << 8
+MAKE_ENUM(ImGuiMultiSelectFlags_BoxSelectNoScroll, BoxSelectNoScroll)
+//    ImGuiMultiSelectFlags_ClearOnEscape         = 1 << 9
+MAKE_ENUM(ImGuiMultiSelectFlags_ClearOnEscape, ClearOnEscape)
+//    ImGuiMultiSelectFlags_ClearOnClickVoid      = 1 << 10
+MAKE_ENUM(ImGuiMultiSelectFlags_ClearOnClickVoid, ClearOnClickVoid)
+//    ImGuiMultiSelectFlags_ScopeWindow           = 1 << 11
+MAKE_ENUM(ImGuiMultiSelectFlags_ScopeWindow, ScopeWindow)
+//    ImGuiMultiSelectFlags_ScopeRect             = 1 << 12
+MAKE_ENUM(ImGuiMultiSelectFlags_ScopeRect, ScopeRect)
+//    ImGuiMultiSelectFlags_SelectOnClick         = 1 << 13
+MAKE_ENUM(ImGuiMultiSelectFlags_SelectOnClick, SelectOnClick)
+//    ImGuiMultiSelectFlags_SelectOnClickRelease  = 1 << 14
+MAKE_ENUM(ImGuiMultiSelectFlags_SelectOnClickRelease, SelectOnClickRelease)
+//    ImGuiMultiSelectFlags_NavWrapX              = 1 << 16
+MAKE_ENUM(ImGuiMultiSelectFlags_NavWrapX, NavWrapX)
+END_ENUM(MultiSelectFlags)
+//struct ImGuiMultiSelectIO
+
+//enum ImGuiSelectionRequestType
+
+START_ENUM(SelectionRequestType)
+//    ImGuiSelectionRequestType_None = 0
+MAKE_ENUM(ImGuiSelectionRequestType_None, None)
+//    ImGuiSelectionRequestType_SetAll
+MAKE_ENUM(ImGuiSelectionRequestType_SetAll, SetAll)
+//    ImGuiSelectionRequestType_SetRange
+MAKE_ENUM(ImGuiSelectionRequestType_SetRange, SetRange)
+END_ENUM(SelectionRequestType)
+//struct ImGuiSelectionRequest
+
+//struct ImGuiSelectionBasicStorage
+
+//struct ImGuiSelectionExternalStorage
 
 //struct ImDrawCmd
 
@@ -3181,26 +3408,24 @@ UINT_ARG(col)
 INT_ARG(num_segments)
 DRAW_LIST_CALL_FUNCTION_NO_RET(AddNgonFilled, center, radius, col, num_segments)
 END_IMGUI_FUNC
-//    IMGUI_API void  AddEllipse(const ImVec2& center, float radius_x, float radius_y, ImU32 col, float rot = 0.0f, int num_segments = 0, float thickness = 1.0f);
+//    IMGUI_API void  AddEllipse(const ImVec2& center, const ImVec2& radius, ImU32 col, float rot = 0.0f, int num_segments = 0, float thickness = 1.0f);
 IMGUI_FUNCTION_DRAW_LIST(AddEllipse)
 IM_VEC_2_ARG(center)
-NUMBER_ARG(radius_x)
-NUMBER_ARG(radius_y)
+IM_VEC_2_ARG(radius)
 UINT_ARG(col)
 OPTIONAL_NUMBER_ARG(rot, 0.0f)
 OPTIONAL_INT_ARG(num_segments, 0)
 OPTIONAL_NUMBER_ARG(thickness, 1.0f)
-DRAW_LIST_CALL_FUNCTION_NO_RET(AddEllipse, center, radius_x, radius_y, col, rot, num_segments, thickness)
+DRAW_LIST_CALL_FUNCTION_NO_RET(AddEllipse, center, radius, col, rot, num_segments, thickness)
 END_IMGUI_FUNC
-//    IMGUI_API void  AddEllipseFilled(const ImVec2& center, float radius_x, float radius_y, ImU32 col, float rot = 0.0f, int num_segments = 0);
+//    IMGUI_API void  AddEllipseFilled(const ImVec2& center, const ImVec2& radius, ImU32 col, float rot = 0.0f, int num_segments = 0);
 IMGUI_FUNCTION_DRAW_LIST(AddEllipseFilled)
 IM_VEC_2_ARG(center)
-NUMBER_ARG(radius_x)
-NUMBER_ARG(radius_y)
+IM_VEC_2_ARG(radius)
 UINT_ARG(col)
 OPTIONAL_NUMBER_ARG(rot, 0.0f)
 OPTIONAL_INT_ARG(num_segments, 0)
-DRAW_LIST_CALL_FUNCTION_NO_RET(AddEllipseFilled, center, radius_x, radius_y, col, rot, num_segments)
+DRAW_LIST_CALL_FUNCTION_NO_RET(AddEllipseFilled, center, radius, col, rot, num_segments)
 END_IMGUI_FUNC
 //    IMGUI_API void  AddText(const ImVec2& pos, ImU32 col, const char* text_begin, const char* text_end = NULL);
 IMGUI_FUNCTION_DRAW_LIST(AddText)
@@ -3213,11 +3438,6 @@ END_IMGUI_FUNC
 //    IMGUI_API void  AddText(const ImFont* font, float font_size, const ImVec2& pos, ImU32 col, const char* text_begin, const char* text_end = NULL, float wrap_width = 0.0f, const ImVec4* cpu_fine_clip_rect = NULL);
 // Unsupported arg type const ImFont* font
 // Unsupported arg type  const ImVec4* cpu_fine_clip_rect = NULL
-//    IMGUI_API void  AddPolyline(const ImVec2* points, int num_points, ImU32 col, ImDrawFlags flags, float thickness);
-// Unsupported arg type const ImVec2* points
-// Unsupported arg type  ImDrawFlags flags
-//    IMGUI_API void  AddConvexPolyFilled(const ImVec2* points, int num_points, ImU32 col);
-// Unsupported arg type const ImVec2* points
 //    IMGUI_API void  AddBezierCubic(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments = 0); // Cubic Bezier (4 control points)
 IMGUI_FUNCTION_DRAW_LIST(AddBezierCubic)
 IM_VEC_2_ARG(p1)
@@ -3239,6 +3459,13 @@ NUMBER_ARG(thickness)
 OPTIONAL_INT_ARG(num_segments, 0)
 DRAW_LIST_CALL_FUNCTION_NO_RET(AddBezierQuadratic, p1, p2, p3, col, thickness, num_segments)
 END_IMGUI_FUNC
+//    IMGUI_API void  AddPolyline(const ImVec2* points, int num_points, ImU32 col, ImDrawFlags flags, float thickness);
+// Unsupported arg type const ImVec2* points
+// Unsupported arg type  ImDrawFlags flags
+//    IMGUI_API void  AddConvexPolyFilled(const ImVec2* points, int num_points, ImU32 col);
+// Unsupported arg type const ImVec2* points
+//    IMGUI_API void  AddConcavePolyFilled(const ImVec2* points, int num_points, ImU32 col);
+// Unsupported arg type const ImVec2* points
 //    IMGUI_API void  AddImage(ImTextureID user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min = ImVec2 0 0, const ImVec2& uv_max = ImVec2 1 1, ImU32 col = IM_COL32_WHITE);
 IMGUI_FUNCTION_DRAW_LIST(AddImage)
 IM_TEXTURE_ID_ARG(user_texture_id)
@@ -3275,6 +3502,10 @@ END_IMGUI_FUNC
 // Unsupported arg type ImU32 col)                                   { AddConvexPolyFilled(_Path.Data
 // Unsupported arg type  _Path.Size
 // Unsupported arg type  col
+//    inline    void  PathFillConcave(ImU32 col)                                  { AddConcavePolyFilled(_Path.Data, _Path.Size, col); _Path.Size = 0; }
+// Unsupported arg type ImU32 col)                                  { AddConcavePolyFilled(_Path.Data
+// Unsupported arg type  _Path.Size
+// Unsupported arg type  col
 //    inline    void  PathStroke(ImU32 col, ImDrawFlags flags = 0, float thickness = 1.0f) { AddPolyline(_Path.Data, _Path.Size, col, flags, thickness); _Path.Size = 0; }
 // Unsupported arg type  ImDrawFlags flags = 0
 // Unsupported arg type  float thickness = 1.0f) { AddPolyline(_Path.Data
@@ -3299,16 +3530,15 @@ INT_ARG(a_min_of_12)
 INT_ARG(a_max_of_12)
 DRAW_LIST_CALL_FUNCTION_NO_RET(PathArcToFast, center, radius, a_min_of_12, a_max_of_12)
 END_IMGUI_FUNC
-//    IMGUI_API void  PathEllipticalArcTo(const ImVec2& center, float radius_x, float radius_y, float rot, float a_min, float a_max, int num_segments = 0); // Ellipse
+//    IMGUI_API void  PathEllipticalArcTo(const ImVec2& center, const ImVec2& radius, float rot, float a_min, float a_max, int num_segments = 0); // Ellipse
 IMGUI_FUNCTION_DRAW_LIST(PathEllipticalArcTo)
 IM_VEC_2_ARG(center)
-NUMBER_ARG(radius_x)
-NUMBER_ARG(radius_y)
+IM_VEC_2_ARG(radius)
 NUMBER_ARG(rot)
 NUMBER_ARG(a_min)
 NUMBER_ARG(a_max)
 OPTIONAL_INT_ARG(num_segments, 0)
-DRAW_LIST_CALL_FUNCTION_NO_RET(PathEllipticalArcTo, center, radius_x, radius_y, rot, a_min, a_max, num_segments)
+DRAW_LIST_CALL_FUNCTION_NO_RET(PathEllipticalArcTo, center, radius, rot, a_min, a_max, num_segments)
 END_IMGUI_FUNC
 //    IMGUI_API void  PathBezierCubicCurveTo(const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, int num_segments = 0); // Cubic Bezier (4 control points)
 IMGUI_FUNCTION_DRAW_LIST(PathBezierCubicCurveTo)
@@ -3385,6 +3615,26 @@ DRAW_LIST_CALL_FUNCTION_NO_RET(PrimQuadUV, a, b, c, d, uv_a, uv_b, uv_c, uv_d, c
 END_IMGUI_FUNC
 //    inline    void  PrimVtx(const ImVec2& pos, const ImVec2& uv, ImU32 col)         { PrimWriteIdx((ImDrawIdx)_VtxCurrentIdx); PrimWriteVtx(pos, uv, col); } // Write vertex with unique index
 // Unsupported arg type  ImU32 col)         { PrimWriteIdx((ImDrawIdx)_VtxCurrentIdx
+//    //inline  void  AddEllipse(const ImVec2& center, float radius_x, float radius_y, ImU32 col, float rot = 0.0f, int num_segments = 0, float thickness = 1.0f) { AddEllipse(center, ImVec2 radius_x radius_y, col, rot, num_segments, thickness); } // OBSOLETED in 1.90.5 (Mar 2024)
+// Unsupported arg type  float thickness = 1.0f) { AddEllipse(center
+// Unsupported arg type  ImVec2 radius_x radius_y
+// Unsupported arg type  col
+// Unsupported arg type  rot
+// Unsupported arg type  num_segments
+// Unsupported arg type  thickness
+//    //inline  void  AddEllipseFilled(const ImVec2& center, float radius_x, float radius_y, ImU32 col, float rot = 0.0f, int num_segments = 0) { AddEllipseFilled(center, ImVec2 radius_x radius_y, col, rot, num_segments); }                        // OBSOLETED in 1.90.5 (Mar 2024)
+// Unsupported arg type  int num_segments = 0) { AddEllipseFilled(center
+// Unsupported arg type  ImVec2 radius_x radius_y
+// Unsupported arg type  col
+// Unsupported arg type  rot
+// Unsupported arg type  num_segments
+//    //inline  void  PathEllipticalArcTo(const ImVec2& center, float radius_x, float radius_y, float rot, float a_min, float a_max, int num_segments = 0) { PathEllipticalArcTo(center, ImVec2 radius_x radius_y, rot, a_min, a_max, num_segments); } // OBSOLETED in 1.90.5 (Mar 2024)
+// Unsupported arg type  int num_segments = 0) { PathEllipticalArcTo(center
+// Unsupported arg type  ImVec2 radius_x radius_y
+// Unsupported arg type  rot
+// Unsupported arg type  a_min
+// Unsupported arg type  a_max
+// Unsupported arg type  num_segments
 //    //inline  void  AddBezierCurve(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments = 0) { AddBezierCubic(p1, p2, p3, p4, col, thickness, num_segments); } // OBSOLETED in 1.80 (Jan 2021)
 // Unsupported arg type  int num_segments = 0) { AddBezierCubic(p1
 // Unsupported arg type  p2
@@ -3425,6 +3675,11 @@ END_IMGUI_FUNC
 //    IMGUI_API void  _OnChangedVtxOffset();
 IMGUI_FUNCTION_DRAW_LIST(_OnChangedVtxOffset)
 DRAW_LIST_CALL_FUNCTION_NO_RET(_OnChangedVtxOffset)
+END_IMGUI_FUNC
+//    IMGUI_API void  _SetTextureID(ImTextureID texture_id);
+IMGUI_FUNCTION_DRAW_LIST(_SetTextureID)
+IM_TEXTURE_ID_ARG(texture_id)
+DRAW_LIST_CALL_FUNCTION_NO_RET(_SetTextureID, texture_id)
 END_IMGUI_FUNC
 //    IMGUI_API void  _PathArcToFastEx(const ImVec2& center, float radius, int a_min_sample, int a_max_sample, int a_step);
 IMGUI_FUNCTION_DRAW_LIST(_PathArcToFastEx)
@@ -3474,9 +3729,9 @@ MAKE_ENUM(ImGuiViewportFlags_OwnedByApp, OwnedByApp)
 END_ENUM(ViewportFlags)
 //struct ImGuiViewport
 
-//struct ImGuiPlatformImeData
+//struct ImGuiPlatformIO
 
-//namespace ImGui
+//struct ImGuiPlatformImeData
 
 //namespace ImGui
 
