@@ -8,7 +8,7 @@ struct editbuf {
 };
 
 static int editbuf_gc(lua_State* L) {
-	struct editbuf* e = (struct editbuf*)lua_touserdata(L, 1);
+	editbuf* e = (editbuf*)lua_touserdata(L, 1);
 	free(e->buf);
 	e->buf = NULL;
 	e->len = 0;
@@ -16,7 +16,7 @@ static int editbuf_gc(lua_State* L) {
 }
 
 static int editbuf_tostring(lua_State* L) {
-	struct editbuf* e = (struct editbuf*)lua_touserdata(L, 1);
+	editbuf* e = (editbuf*)lua_touserdata(L, 1);
 	lua_pushstring(L, e->buf);
 	return 1;
 }
@@ -31,10 +31,12 @@ static void create_new_editbuf(lua_State* L, int argpos) {
 		len = len + 1;
 	}
 
-	struct editbuf* e = (struct editbuf*)lua_newuserdata(L, sizeof(struct editbuf));
+	editbuf* e = (editbuf*)lua_newuserdata(L, sizeof(struct editbuf));
+	new (e) editbuf();
 	e->buf = (char*)malloc(len);
 	if (e->buf == NULL) {
 		luaL_error(L, "Failed to allocate memory for editbuf");
+		return;
 	}
 	e->len = len;
 	if (buf) {
@@ -66,7 +68,7 @@ static int edit_callback(ImGuiInputTextCallbackData* data) {
 	case ImGuiInputTextFlags_CallbackResize:
 	{
 		size_t newsize = e->len;
-		while (newsize < (size_t)data->BufTextLen) {
+		while (newsize < (size_t)data->BufSize) {
 			newsize *= 2;
 		}
 		data->Buf = (char*)realloc(e->buf, newsize);
