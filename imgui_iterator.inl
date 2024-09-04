@@ -104,9 +104,25 @@ CALL_FUNCTION_NO_RET(End)
 POP_END_STACK(1)
 END_IMGUI_FUNC
 //    IMGUI_API bool          BeginChild(const char* str_id, const ImVec2& size = ImVec2 0 0, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0);
-// Unsupported arg type  ImGuiChildFlags child_flags = 0
+IMGUI_FUNCTION(BeginChild)
+LABEL_ARG(str_id)
+OPTIONAL_IM_VEC_2_ARG(size, 0, 0)
+OPTIONAL_INT_ARG(child_flags, 0)
+OPTIONAL_INT_ARG(window_flags, 0)
+CALL_FUNCTION(BeginChild, bool, str_id, size, child_flags, window_flags)
+IF_RET_ADD_END_STACK(2)
+PUSH_BOOL(ret)
+END_IMGUI_FUNC
 //    IMGUI_API bool          BeginChild(ImGuiID id, const ImVec2& size = ImVec2 0 0, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0);
-// Unsupported arg type  ImGuiChildFlags child_flags = 0
+IMGUI_FUNCTION(BeginChild_4)
+UINT_ARG(id)
+OPTIONAL_IM_VEC_2_ARG(size, 0, 0)
+OPTIONAL_INT_ARG(child_flags, 0)
+OPTIONAL_INT_ARG(window_flags, 0)
+CALL_FUNCTION(BeginChild, bool, id, size, child_flags, window_flags)
+IF_RET_ADD_END_STACK(2)
+PUSH_BOOL(ret)
+END_IMGUI_FUNC
 //    IMGUI_API void          EndChild();
 IMGUI_FUNCTION(EndChild)
 CALL_FUNCTION_NO_RET(EndChild)
@@ -126,7 +142,7 @@ END_IMGUI_FUNC
 // Unsupported arg type ImGuiFocusedFlags flags=0
 //    IMGUI_API bool          IsWindowHovered(ImGuiHoveredFlags flags=0); // is current window hovered and hoverable (e.g. not blocked by a popup/modal)? See ImGuiHoveredFlags_ for options. IMPORTANT: If you are trying to check whether your mouse should be dispatched to Dear ImGui or to your underlying app, you should not use this function! Use the 'io.WantCaptureMouse' boolean for that! Refer to FAQ entry "How can I tell whether to dispatch mouse/keyboard to Dear ImGui or my application?" for details.
 IMGUI_FUNCTION(IsWindowHovered)
-INT_ARG(flags)
+OPTIONAL_INT_ARG(flags, 0)
 CALL_FUNCTION(IsWindowHovered, bool, flags)
 PUSH_BOOL(ret)
 END_IMGUI_FUNC
