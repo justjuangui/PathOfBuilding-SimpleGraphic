@@ -1915,6 +1915,8 @@ MAKE_ENUM(ImGuiItemFlags_NoNavDefaultFocus, NoNavDefaultFocus)
 MAKE_ENUM(ImGuiItemFlags_ButtonRepeat, ButtonRepeat)
 //    ImGuiItemFlags_AutoClosePopups          = 1 << 4
 MAKE_ENUM(ImGuiItemFlags_AutoClosePopups, AutoClosePopups)
+//    ImGuiItemFlags_AllowDuplicateId         = 1 << 5
+MAKE_ENUM(ImGuiItemFlags_AllowDuplicateId, AllowDuplicateId)
 END_ENUM(ItemFlags)
 //enum ImGuiInputTextFlags_
 
